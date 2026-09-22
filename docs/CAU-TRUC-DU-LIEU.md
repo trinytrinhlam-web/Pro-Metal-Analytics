@@ -135,9 +135,8 @@ Xem chi tiết trong `BAO-HANH.md` (bảng `bao_hanh_dich_vu`, `don_hang_muc`,
 `bao_hanh_log`) và `GHI-AM-AI.md` (kho lưu tạm file ghi âm, xoá sau khi thợ
 xác nhận).
 
-Điểm cần nhớ: **thời hạn bảo hành phải chép cứng vào từng hạng mục lúc tạo đơn**,
-không tính lại từ bảng cấu hình. Đổi chính sách về sau thì chỉ ảnh hưởng khách mới,
-không rút bảo hành của khách đã làm.
+Bảo hành: **24 tháng cho mọi hạng mục**. Hạn được ghi sẵn vào `don_hang_muc.bh_het_han`
+lúc tạo đơn, nên tra cứu về sau chỉ việc đọc chứ không phải tính lại.
 
 ## Danh mục cần bạn chốt
 

@@ -306,9 +306,9 @@ var DICHVU=["Cửa cổng","Cửa cuốn","Lan can – ban công","Cầu thang",
 var KHUVUC=["Gò Vấp","Tân Bình","Bình Thạnh","Quận 12","Thủ Đức","Quận 7","Tân Phú","Bình Tân","Quận 10","Hóc Môn"];
 var CONGTRINH=["Nhà phố","Chung cư","Xưởng – kho","Shop – văn phòng"];
 var LYDO=["Giá cao","Ở quá xa","Đã thuê thợ khác","Không liên lạc lại được","Chỉ hỏi tham khảo"];
-/* Thời hạn bảo hành mỗi hạng mục, tính bằng tháng. Sửa được trong Cài đặt. */
-var BAOHANH={"Cửa cổng":24,"Cửa cuốn":18,"Lan can – ban công":24,"Cầu thang":24,
-             "Khung bảo vệ":12,"Mái tôn":12,"Sơn – hàn vá":6};
+/* Bảo hành 24 tháng cho mọi hạng mục. Cấu trúc vẫn tách theo từng hạng mục để
+   sau này muốn cho hạng mục nào khác đi thì chỉ cần thêm vào đây. */
+var BAOHANH_MAC_DINH=24, BAOHANH={};
 var THO=[{id:"t1",ten:"Anh Hùng",tat:"HÙ"},{id:"t2",ten:"Anh Tuấn",tat:"TU"},{id:"t3",ten:"Anh Sơn",tat:"SƠ"}];
 var THUVN=["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"];
 var THUNG=["CN","T2","T3","T4","T5","T6","T7"];
@@ -438,6 +438,7 @@ var KHONGRO={id:null,so:"Chưa gán",kenh:"Chưa rõ nguồn",mau:"var(--ink3)",
 function hl(id){for(var i=0;i<HOTLINES.length;i++)if(HOTLINES[i].id===id)return HOTLINES[i];return KHONGRO}
 function hhmm(d){return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function ddmm(d){return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)}
+function ddmmyy(d){return ddmm(d)+"/"+d.getFullYear()}
 function fmtSdt(s){s=String(s).replace(/\D/g,"").slice(0,10);return s.replace(/^(\d{4})(\d{0,3})(\d{0,3}).*$/,function(m,a,b,c){return a+(b?" "+b:"")+(c?" "+c:"")})}
 
 /* ============ Trạng thái màn hình thợ ============ */
@@ -506,7 +507,7 @@ function tplVoice(){
     +'<div class="heard"><div class="k">Máy nghe được</div><q>'+esc(V.cau)+'</q></div>'
     +'<div class="vdone"><span style="font-size:17px">✓</span><span><b>Đã điền '+Object.keys(F.ai).length+' thông tin.</b>'
       +'Kiểm lại giúp, sai chỗ nào sửa chỗ đó rồi bấm Lưu khách.</span></div>'
-    +'<div class="xoafile"><span>🗑</span><span>File ghi âm sẽ bị xoá khỏi máy chủ ngay khi bạn bấm Lưu.</span></div>'
+    +'<div class="xoafile"><span>🗑</span><span>Bấm Lưu là <b>xoá file ghi âm</b> khỏi máy chủ ngay. Riêng đoạn chữ ở trên được giữ lại trong ô Ghi chú cuối trang.</span></div>'
     +'<button class="mic" id="v-lai" style="margin-top:11px;background:var(--panel);color:var(--ink);border:1.5px solid var(--line2)">Đọc lại từ đầu</button></div>';
   return '<div class="voice"><h3>🎤 Nói cho nhanh</h3>'
     +'<p>Ngại gõ thì bấm nút rồi đọc một hơi: <b>tên, số điện thoại, làm gì, ở đâu, chốt chưa, bao nhiêu tiền</b>. Máy tự điền vào các ô bên dưới, bạn chỉ việc kiểm lại.</p>'
@@ -549,7 +550,7 @@ function scrNhap(){
     +'<input class="inp big" id="f-rev" inputmode="numeric" placeholder="0đ" value="'+(F.rev?Number(F.rev).toLocaleString("vi-VN"):"")+'">'
     +'<div class="quick">'+[500000,1000000,2000000,5000000].map(function(v){return '<button data-add="'+v+'">+'+ngan(v)+'</button>'}).join('')+'<button data-add="0">Xoá</button></div></div>'
 
-  +'<div class="fld"><div class="lb">Ghi chú</div><input class="inp" id="f-note" placeholder="VD: hẹn qua khảo sát sáng mai" value="'+esc(F.note)+'"></div>'
+  +'<div class="fld'+ai("note")+'"><div class="lb">Ghi chú'+(F.ai.note?' <i>lời bạn vừa đọc, sửa hoặc xoá được</i>':'')+'</div><input class="inp" id="f-note" placeholder="VD: hẹn qua khảo sát sáng mai" value="'+esc(F.note)+'"></div>'
   +'</div>'
   +'<div class="save"><button id="btn-save">'+(e?"CẬP NHẬT ĐƠN":"LƯU KHÁCH")+'</button></div>';
 }
@@ -646,6 +647,9 @@ function bindTho(){
         if(m.ra[k]===""||m.ra[k]==null)return;
         F[k]=(k==="dv")?m.ra[k].slice():m.ra[k]; F.ai[k]=true;
       });
+      /* Giữ lại nguyên văn lời thợ đọc vào ghi chú — file âm thanh thì xoá,
+         mấy dòng chữ này ở lại để sau tra được đã nói gì. */
+      F.note=F.note?F.note+" · "+m.cau:m.cau; F.ai.note=true;
       V.tt="xong"; render();
     },1700);
   };
@@ -1048,9 +1052,20 @@ function themThang(d,m){var x=new Date(d);var ng=x.getDate();x.setMonth(x.getMon
   if(x.getDate()<ng)x.setDate(0);return x}
 function hangMuc(l){
   return (l.dv.length?l.dv:["Khác"]).map(function(d){
-    var th=BAOHANH[d]||12, het=themThang(l.t,th);
+    var th=BAOHANH[d]||BAOHANH_MAC_DINH, het=themThang(l.t,th);
     return {dv:d,thang:th,het:het,con:Math.ceil((het-NOW)/864e5)};
   });
+}
+/* Các hạng mục cùng thời hạn thì hết hạn cùng ngày — gộp một dòng cho gọn.
+   Hạng mục nào có thời hạn khác sẽ tự tách ra dòng riêng. */
+function gomBH(hm){
+  var m={},k=[];
+  hm.forEach(function(x){
+    var key=x.thang+"|"+x.het.getTime();
+    if(!m[key]){m[key]={dv:[],thang:x.thang,het:x.het,con:x.con};k.push(key)}
+    m[key].dv.push(x.dv);
+  });
+  return k.map(function(key){var g=m[key];return {dv:g.dv.join(", "),thang:g.thang,het:g.het,con:g.con}});
 }
 /* Đơn còn bảo hành nếu còn ít nhất một hạng mục chưa hết hạn. */
 function bhDon(l){
@@ -1121,21 +1136,21 @@ function khCard(x){
    +'<span class="nm"><b>'+esc(x.ten||"(chưa có tên)")+'</b><span>'+fmtSdt(x.sdt)+' · '+x.don.length+' lần liên hệ · '
      +x.chot.length+' đơn đã làm'+(x.soBH?' · đã bảo hành '+x.soBH+' lần':'')+'</span></span>'
    +nhanTT(x.tt,x.con)
-   +'<span class="rt"><b>'+ngan(x.tong)+'</b>gần nhất '+ddmm(x.cuoi.t)+'</span>'
+   +'<span class="rt"><b>'+ngan(x.tong)+'</b>gần nhất '+ddmmyy(x.cuoi.t)+'</span>'
    +'<span style="color:var(--ink3);font-size:15px">'+(mo?"▴":"▾")+'</span></button>'
    +(mo?'<div class="body">'+x.don.slice().reverse().map(jobRow).join('')+'</div>':'')
    +'</div>';
 }
 function jobRow(l){
   var b=bhDon(l), h=hl(l.hotline);
-  return '<div class="job"><div class="t"><b>'+ddmm(l.t)+' '+hhmm(l.t)+'</b>'
+  return '<div class="job"><div class="t"><b>'+ddmmyy(l.t)+' '+hhmm(l.t)+'</b>'
    +'<span class="tag t-'+l.tt+'">'+(l.tt==="chot"?"Đã làm":l.tt==="hoi"?"Chỉ hỏi giá":"Từ chối")+'</span>'
    +'<span>'+esc(l.dv.join(", ")||"—")+'</span>'
    +(l.rev?'<b style="margin-left:auto">'+vnd(l.rev)+'</b>':'')+'</div>'
-   +(b?'<div class="bh">'+b.hm.map(function(m){
+   +(b?'<div class="bh">'+gomBH(b.hm).map(function(m){
       var t=m.con<0?"het":m.con<=60?"sap":"con";
       return '<div class="r"><span>'+esc(m.dv)+' <span class="d">· bảo hành '+m.thang+' tháng</span></span>'
-        +'<span class="d">đến '+ddmm(m.het)+'/'+m.het.getFullYear()+'</span>'+nhanTT(t,m.con)+'</div>'}).join('')
+        +'<span class="d">đến '+ddmmyy(m.het)+'</span>'+nhanTT(t,m.con)+'</div>'}).join('')
      +'</div>'
      +'<div class="bhlog">'+(l.bh&&l.bh.length
         ?'<span>Đã bảo hành '+l.bh.length+' lần: '+l.bh.map(function(x){return ddmm(x)}).join(", ")+'</span>'

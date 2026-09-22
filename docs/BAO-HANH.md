@@ -16,25 +16,17 @@ Kết quả cho biết ngay:
 Không tìm thấy số thì báo rõ là khách mới, hoặc số đã nhập sai lúc trước — chứ
 không để màn hình trống làm bạn tưởng phần mềm hỏng.
 
-## Hạn bảo hành theo hạng mục
+## Hạn bảo hành
 
-Mỗi hạng mục một thời hạn riêng, sửa được trong Cài đặt:
+**24 tháng cho mọi hạng mục.**
 
-| Hạng mục | Mặc định |
-|---|---|
-| Cửa cổng | 24 tháng |
-| Lan can – ban công | 24 tháng |
-| Cầu thang | 24 tháng |
-| Cửa cuốn | 18 tháng |
-| Khung bảo vệ | 12 tháng |
-| Mái tôn | 12 tháng |
-| Sơn – hàn vá | 6 tháng |
+Vì cùng thời hạn nên một đơn làm nhiều hạng mục sẽ hết hạn cùng một ngày, và phần
+mềm gộp lại một dòng cho gọn: *“Cửa cuốn, Sơn – hàn vá · bảo hành 24 tháng · đến
+22/09/2028”*.
 
-👉 **Đây là con số tôi đặt tạm. Cần bạn cho biết thời hạn thật của xưởng.**
-
-Một đơn làm nhiều hạng mục thì mỗi hạng mục hết hạn một lúc khác nhau — ví dụ
-cổng còn bảo hành mà phần sơn đã hết. Phần mềm hiện tách riêng từng dòng, không
-gộp chung thành một hạn duy nhất, vì gộp lại là nguồn cãi nhau với khách.
+Cấu trúc bên trong vẫn tính theo **từng hạng mục**. Sau này nếu bạn muốn cho hạng
+mục nào ngắn hơn (ví dụ phần sơn), chỉ cần thêm một dòng vào cấu hình — hệ thống
+sẽ tự tách ra thành hai dòng hạn khác nhau, không phải sửa gì thêm.
 
 Ba trạng thái: **Còn bảo hành** (xanh) · **Sắp hết, còn ≤60 ngày** (vàng) ·
 **Hết bảo hành** (xám).
@@ -59,31 +51,22 @@ chưa đạt, hoặc vật tư có vấn đề.
 Dữ liệu này để dành cho một báo cáo sau: **hạng mục nào hay phải bảo hành nhất**.
 Biết được thì sửa từ khâu làm, chứ không phải chạy theo sửa mãi.
 
-## Một chi tiết kỹ thuật quan trọng
-
-Bản demo đang tính hạn bảo hành từ bảng cấu hình **hiện tại**. Bản thật **không
-được** làm vậy: phải chép thời hạn vào từng đơn **ngay lúc tạo đơn**.
-
-Lý do: nếu sau này bạn đổi bảo hành cổng từ 24 xuống 12 tháng, mà hệ thống tính
-lại từ cấu hình mới, thì hàng trăm khách cũ tự nhiên mất bảo hành — dù lúc làm
-bạn đã hứa 24 tháng. Chép cứng vào đơn thì đổi chính sách chỉ ảnh hưởng khách mới,
-đúng như ngoài đời.
-
 ## Bảng dữ liệu cần thêm
 
 ```sql
--- Thời hạn bảo hành từng hạng mục (cấu hình, sửa được)
+-- Thời hạn bảo hành: mặc định 24 tháng cho tất cả.
+-- Chỉ thêm dòng vào bảng này nếu sau muốn hạng mục nào ngắn hơn.
 create table bao_hanh_dich_vu (
   dich_vu  text primary key,
-  so_thang int  not null check (so_thang > 0)
+  so_thang int  not null default 24 check (so_thang > 0)
 );
 
--- Thời hạn chép cứng vào từng hạng mục của từng đơn, ngay lúc tạo đơn
+-- Hạng mục của từng đơn, hạn bảo hành ghi sẵn lúc tạo đơn
 create table don_hang_muc (
   id            uuid primary key default gen_random_uuid(),
   khach_hang_id uuid not null references khach_hang(id) on delete cascade,
   dich_vu       text not null,
-  bh_so_thang   int  not null,              -- chép lúc tạo, không đọc lại cấu hình
+  bh_so_thang   int  not null default 24,
   bh_het_han    date not null               -- = ngày làm + bh_so_thang
 );
 

@@ -109,13 +109,18 @@ gọi với khách. Ghi âm người khác khi họ không biết là chuyện k
 lý. Trong ứng dụng nên có một dòng nhắc thợ điều này, và không làm tính năng ghi
 âm cuộc gọi.
 
-## Cần bạn quyết một việc
+## Chữ giữ lại, tiếng xoá đi
 
-Sau khi phân tích xong, phần **chữ máy nghe được** (transcript) có giữ lại không?
+Đã chốt: **giữ lại nguyên văn lời thợ đọc**, lưu vào ô **Ghi chú** của đơn.
 
-- **Giữ**: lưu vào ô ghi chú của đơn. Chỉ là mấy dòng chữ, không nặng server, và
-  sau này tra lại biết thợ đã nói gì.
-- **Không giữ**: xoá luôn cùng file âm thanh. Sạch nhất.
+```
+File âm thanh  ->  xoá ngay khi thợ bấm Lưu
+Chữ đã nghe    ->  ở lại trong ô Ghi chú
+```
 
-Bản demo đang hiện transcript ra cho thợ xem rồi bỏ. Bạn muốn giữ thì tôi lưu vào
-ghi chú.
+Chỉ là mấy dòng chữ nên không nặng server, mà sau này tra lại biết thợ đã nói gì —
+hữu ích nhất khi cần đối chiếu một đơn có tranh cãi, hoặc khi muốn xem máy nghe
+sai chỗ nào để chỉnh lại cách đọc.
+
+Thợ sửa hoặc xoá đoạn chữ đó được, vì nó nằm ngay trong ô Ghi chú bình thường. Ô
+này có nhãn *“lời bạn vừa đọc, sửa hoặc xoá được”* để thợ khỏi tưởng là chữ lạ.

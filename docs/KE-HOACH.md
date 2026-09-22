@@ -10,6 +10,8 @@
 | Trường thêm | Trạng thái đơn + lý do từ chối, Khu vực (quận), Loại công trình |
 | **Nguồn khách** | **Thợ không nhập.** Admin gán nguồn ở màn "Duyệt đơn" (xem mục 1.1) |
 | Doanh thu | Để trống được, điền sau khi làm xong việc |
+| Bảo hành | 24 tháng cho mọi hạng mục |
+| Lời thợ đọc | Giữ lại trong ô Ghi chú; file ghi âm thì xoá ngay sau khi lưu |
 
 ### 1.1 Điểm còn phải chốt: nguồn khách điền bằng cách nào
 
@@ -148,8 +150,6 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 
 1. Xem demo, nói chỗ nào cần sửa
 2. Chốt danh sách dịch vụ đúng với nghề của bạn (demo đang để 7 loại)
-2b. **Chốt thời hạn bảo hành thật của từng hạng mục** (demo đang để tạm, xem `BAO-HANH.md`)
-2c. **Quyết có giữ lại phần chữ máy nghe được không** (xem cuối `GHI-AM-AI.md`)
 3. Chốt danh sách quận/huyện bạn nhận việc
 4. Chuẩn bị số hotline cho từng kênh
 5. Cho biết ngân sách quảng cáo hiện tại từng kênh/tháng
