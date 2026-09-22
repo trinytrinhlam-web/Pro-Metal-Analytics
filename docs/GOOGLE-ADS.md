@@ -44,16 +44,12 @@ lâu. Đủ để đối chiếu tổng số, không đủ để gán từng kh�
 
 ### Ba cách lách, từ rẻ tới đắt
 
-**Cách A — Tải báo cáo tay, mỗi tuần một lần (miễn phí)**
+**Cách A — Tải báo cáo tay, mỗi tuần một lần (miễn phí) — ĐÃ LÀM ✅**
 
 Giao diện Google Ads **có hiện số điện thoại khách** — chỉ API mới không có. Hiện
 với hầu hết cuộc gọi dài trên 15 giây (Ấn Độ và Nhật thì không; Việt Nam thì có).
 
-Vậy: mỗi tuần vào Google Ads tải báo cáo **Chi tiết cuộc gọi** ra CSV, kéo thả vào
-phần mềm, hệ thống tự khớp theo số điện thoại và gán nguồn hàng loạt.
-
-👉 Đây là thứ đáng làm nhất trong ba cách: **miễn phí, và biến việc duyệt đơn hằng
-ngày thành 2 phút mỗi tuần.**
+Đã dựng xong trong demo, nằm ngay đầu tab **Duyệt đơn**. Xem mục riêng bên dưới.
 
 **Cách B — Dùng số chuyển tiếp của Google làm hotline (miễn phí, cần tổng đài)**
 
@@ -65,6 +61,60 @@ không phải mua sim. Chỉ còn thiếu một thứ: phần mềm phải biế
 mà cái đó cần tổng đài (xem `NHAP-NHANH.md` cách 4).
 
 **Cách C — Admin gán tay** — cách đang làm hiện nay.
+
+---
+
+## Phần nhập báo cáo cuộc gọi — đã dựng xong
+
+Nằm ngay đầu tab **Duyệt đơn**.
+
+### Lấy file ở đâu
+
+Trong Google Ads: **Chiến dịch → Insights & báo cáo → Báo cáo → Chi tiết cuộc
+gọi**. Nhớ bật cột **Số điện thoại người gọi**, rồi tải về .csv.
+
+### Đưa vào phần mềm
+
+Chọn file .csv, hoặc mở bằng Excel rồi dán thẳng nội dung vào ô. Có nút **Dùng
+file mẫu** để xem thử luồng chạy mà không cần file thật.
+
+Bộ đọc không bắt file phải đúng một khuôn:
+
+- Nhận cả tiêu đề tiếng Việt lẫn tiếng Anh (*Số điện thoại người gọi* / *Caller phone number*)
+- Tự bỏ qua mấy dòng đầu Google chèn thêm và dòng *Tổng cộng* ở cuối
+- Nhận số dạng `+84...` lẫn `0...`
+- Nhận ngày kiểu `22/09/2026 13:17:05` lẫn `2026-09-22 13:17:05`
+- Bỏ dòng trùng
+
+### Bốn việc nó làm với mỗi cuộc gọi
+
+| Kết quả khớp | Việc làm |
+|---|---|
+| Khớp đúng số, đơn chưa có nguồn | **Gán nguồn** |
+| Khớp 9 số cuối, đơn chưa có nguồn | **Gán nguồn + sửa lại số điện thoại** |
+| Không có đơn nào | **Tạo đơn nháp** (tuỳ chọn, mặc định bật) |
+| Đơn đã có nguồn rồi | Bỏ qua |
+
+**Vì sao khớp cả theo 9 số cuối:** số di động Việt Nam là 0 + 9 số. Thợ gõ sai
+một chữ số đầu là khớp hụt ngay. Báo cáo của Google mới là số đúng, nên hệ thống
+lấy số đó sửa lại luôn và ghi rõ đã sửa gì.
+
+### Chỗ đáng tiền nhất: cuộc gọi không có đơn nào
+
+Đây là những khách **đã gọi tới mà không có trong hệ thống** — thợ quên nhập,
+hoặc đang hàn không nghe được máy.
+
+Bạn đã trả tiền quảng cáo cho từng cuộc gọi đó rồi. Trước đây chúng biến mất
+khỏi số liệu, làm CPL và CPA trông đẹp hơn thực tế. Giờ mỗi cuộc thành một đơn
+nháp có sẵn số điện thoại và giờ gọi, chờ bạn bổ sung — hoặc ít nhất là gọi lại.
+
+### Thời lượng cuộc gọi cũng được lưu
+
+Báo cáo có cột thời lượng nên hệ thống lưu luôn. Cuộc gọi **dưới 15 giây** bị
+đánh dấu *nhiều khả năng là số rác hoặc bấm nhầm* ngay trên thẻ duyệt.
+
+Đây là thứ mà chỉ nhìn số lượng cuộc gọi sẽ không thấy: một kênh ra 50 cuộc mà
+30 cuộc dưới 15 giây thì thực chất chỉ có 20 khách.
 
 ---
 
@@ -122,8 +172,8 @@ tháng nên đủ — nhưng chỉ khi đơn nào cũng được duyệt và đi
 
 | Giai đoạn | Làm gì |
 |---|---|
-| **2** (bây giờ) | Chưa đụng API. Admin gán nguồn tay |
-| **3** | Việc 1: tự lấy chi phí. Thêm **kéo thả CSV báo cáo cuộc gọi** (cách A) — miễn phí, cắt gần hết việc duyệt tay |
+| **2** (bây giờ) | Chưa đụng API. **Nhập CSV báo cáo cuộc gọi** cho phần lớn đơn, còn lại gán tay |
+| **3** | Việc 1: tự lấy chi phí bằng API (phần nhập CSV thì đã xong) |
 | **4** | Việc 3: gửi ngược chuyển đổi. Chỉ làm sau khi đã có 2–3 tháng dữ liệu sạch |
 
 **Đừng làm việc 3 trước việc 2.** Chưa gán được nguồn chính xác mà đã gửi ngược

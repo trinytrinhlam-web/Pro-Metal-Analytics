@@ -31,7 +31,8 @@ khách ở màn hình thợ rồi bấm sang tab Admin sẽ thấy số liệu �
 Màn hình thợ có nút **🎤 Nói cho nhanh** ở đầu trang: bấm, đọc một hơi, máy điền
 vào form (bản demo dùng câu mẫu, bản thật gọi Gemini).
 
-Bên Admin có bốn tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo),
+Bên Admin có bốn tab: **Duyệt đơn** (nhập báo cáo cuộc gọi Google Ads, kiểm dữ
+liệu thợ nhập, gán nguồn quảng cáo),
 **Khách cũ & bảo hành** (tra cứu theo số điện thoại, hạn bảo hành, danh sách sắp
 hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (thêm thợ, đặt mã PIN).
 

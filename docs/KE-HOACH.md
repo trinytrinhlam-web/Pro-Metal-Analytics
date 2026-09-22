@@ -117,6 +117,9 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 - **Màn hình "Duyệt đơn"**: kiểm tra tự động, cảnh báo đỏ khi trùng số điện thoại
   (tách nhập trùng với khách cũ gọi lại), gán nguồn lẻ và hàng loạt, sửa mọi
   trường tại chỗ, xoá đơn trùng
+- **Nhập báo cáo cuộc gọi Google Ads**: khớp theo số điện thoại, gán nguồn hàng
+  loạt, sửa số thợ gõ sai, và tạo đơn nháp cho cuộc gọi chưa có đơn nào — xem
+  `GOOGLE-ADS.md`
 - **Bảng khách cũ quay lại**: số lượt, doanh thu, tỷ lệ chốt so với khách mới
 - **Tab "Khách cũ & bảo hành"**: tra cứu theo số điện thoại, hạn bảo hành từng
   hạng mục, danh sách sắp hết hạn cần gọi, ghi nhận lần bảo hành — xem `BAO-HANH.md`
@@ -124,8 +127,6 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 - Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
 - Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS
 - **Tự lấy chi phí từ Google Ads API** thay cho nhập tay
-- **Kéo thả CSV báo cáo cuộc gọi Google Ads** → tự khớp số điện thoại, gán nguồn
-  hàng loạt. Việc duyệt đơn hằng ngày rút còn ~2 phút mỗi tuần — xem `GOOGLE-ADS.md`
 - Xuất Excel
 - Gợi ý tối ưu quảng cáo tự động
 

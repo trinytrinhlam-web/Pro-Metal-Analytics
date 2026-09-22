@@ -117,8 +117,12 @@ vội. Nhìn xu hướng 2–3 tháng.
 
 ## Quy trình đề nghị: vài phút mỗi ngày + 15 phút mỗi thứ Hai
 
-**Mỗi ngày (2–3 phút):** mở tab **Duyệt đơn**. Xử lý thẻ **viền đỏ** trước (trùng
-số điện thoại — nhập hai lần hay khách cũ gọi lại), rồi gán nguồn cho đơn còn lại
+**Mỗi tuần (2 phút):** tải báo cáo **Chi tiết cuộc gọi** từ Google Ads, thả vào
+đầu tab **Duyệt đơn**. Nguồn được gán hàng loạt, số gõ sai được sửa, và cuộc gọi
+nào chưa có đơn thì thành đơn nháp.
+
+**Mỗi ngày (1–2 phút):** mở tab **Duyệt đơn**. Xử lý thẻ **viền đỏ** trước (trùng
+số điện thoại — nhập hai lần hay khách cũ gọi lại), rồi gán nguồn cho đơn còn sót
 và xác nhận. Làm gộp cả loạt bằng cách tích chọn nhiều đơn.
 
 **Mỗi thứ Hai (15 phút):**
