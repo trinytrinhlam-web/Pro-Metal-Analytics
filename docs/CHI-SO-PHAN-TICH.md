@@ -7,9 +7,14 @@ hành động cụ thể trên tài khoản quảng cáo.
 
 | Chỉ số | Tính bằng | Nghĩa là gì |
 |---|---|---|
-| **CPL** — giá một khách | chi phí quảng cáo ÷ số khách gọi đến | Bỏ bao nhiêu tiền để có một cuộc gọi |
-| **CPA** — giá một đơn | chi phí quảng cáo ÷ số đơn đã chốt | Bỏ bao nhiêu tiền để có một việc làm thật |
-| **ROAS** | doanh thu ÷ chi phí quảng cáo | Một đồng quảng cáo thu về mấy đồng |
+| **CPL** — giá một khách | chi phí quảng cáo ÷ số **khách mới** | Bỏ bao nhiêu tiền để có một cuộc gọi |
+| **CPA** — giá một đơn | chi phí quảng cáo ÷ số đơn chốt từ **khách mới** | Bỏ bao nhiêu tiền để có một việc làm thật |
+| **ROAS** | doanh thu **khách mới** ÷ chi phí quảng cáo | Một đồng quảng cáo thu về mấy đồng |
+
+> **Cả ba chỉ số đều chỉ tính trên khách mới.** Khách cũ gọi lại không tốn đồng
+> quảng cáo nào — gộp họ vào mẫu số sẽ làm CPL và CPA rẻ đi một cách giả tạo, rồi
+> bạn tăng ngân sách dựa trên con số sai. Doanh thu từ khách cũ được tách ra bảng
+> riêng, xem Nhóm 7.
 
 **CPA quan trọng hơn CPL rất nhiều.** Một kênh cho khách rẻ mà không ai chốt thì
 đắt hơn kênh khách đắt mà chốt đều. Đây là chỗ nhiều người tối ưu sai.
@@ -86,6 +91,21 @@ Khách từ chối vì "giá cao" và khách từ chối vì "ở quá xa" là h
 khác nhau: một cái sửa ở nội dung quảng cáo, một cái sửa ở vùng nhắm. Không ghi
 lý do thì cả hai đều chỉ hiện ra là "tỷ lệ chốt thấp" và không biết chỉnh chỗ nào.
 
+## Nhóm 7 — Khách cũ quay lại
+
+Nhận ra bằng số điện thoại: đã có đơn trước đó cách hơn 12 tiếng thì tính là khách
+cũ. Bảng cho ba số: **số lượt gọi lại**, **doanh thu**, **tỷ lệ chốt so với khách mới**.
+
+Đây thường là nhóm lãi nhất mà ít ai đo: chi phí quảng cáo bằng 0, tỷ lệ chốt
+thường cao hơn hẳn vì đã tin nhau, giá trị đơn cũng nhỉnh hơn.
+
+**Dùng để làm gì:** trước khi tăng ngân sách kéo khách mới, so hai con số — bỏ
+thêm tiền quảng cáo để có một khách mới, hay nhắn lại nhóm khách cũ đã làm trên
+6 tháng. Nếu tỷ lệ chốt của khách cũ cao hơn rõ rệt thì việc thứ hai rẻ hơn nhiều.
+
+Cũng là chỗ để tính chính sách riêng cho khách cũ: giá ưu đãi, bảo hành, gọi chăm
+sóc định kỳ. Số liệu ở đây cho biết nhóm đó đáng đầu tư tới đâu.
+
 ## Nhóm 6 — So với kỳ trước
 
 Mọi chỉ số đều có mũi tên so với kỳ trước cùng độ dài. Con số đứng một mình
@@ -97,8 +117,9 @@ vội. Nhìn xu hướng 2–3 tháng.
 
 ## Quy trình đề nghị: vài phút mỗi ngày + 15 phút mỗi thứ Hai
 
-**Mỗi ngày (2–3 phút):** mở tab **Duyệt đơn**, gán nguồn cho đơn mới, sửa chỗ nào
-phần mềm báo đỏ, xác nhận. Làm gộp cả loạt bằng cách tích chọn nhiều đơn.
+**Mỗi ngày (2–3 phút):** mở tab **Duyệt đơn**. Xử lý thẻ **viền đỏ** trước (trùng
+số điện thoại — nhập hai lần hay khách cũ gọi lại), rồi gán nguồn cho đơn còn lại
+và xác nhận. Làm gộp cả loạt bằng cách tích chọn nhiều đơn.
 
 **Mỗi thứ Hai (15 phút):**
 

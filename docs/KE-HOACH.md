@@ -33,13 +33,35 @@ hàng chờ, bạn kiểm rồi xác nhận.
 | Cảnh báo | Nghĩa là |
 |---|---|
 | Số điện thoại thiếu số / sai đầu số | Thợ bấm nhầm, gọi lại không được |
-| Trùng số với đơn ngày… | Có thể nhập hai lần, hoặc khách cũ gọi lại — bạn quyết |
+| **Trùng số điện thoại** (đỏ, nổi nhất) | Xem mục riêng bên dưới |
 | Đã chốt nhưng chưa có tiền công | Doanh thu và ROAS đang bị tính thiếu |
 | Thiếu lý do từ chối | Mất một dòng dữ liệu để biết quảng cáo sai chỗ nào |
 | Thiếu khu vực / dịch vụ / tên | Nhẹ, không chặn |
 
 "Chưa gán nguồn" **không tính là lỗi** — đơn nào mới vào cũng vậy. Chỉ lỗi thật
 mới làm thẻ nổi viền cam và lọt vào bộ lọc "Có vấn đề".
+
+### Trùng số điện thoại — cảnh báo mức cao nhất
+
+Thẻ **viền đỏ**, nổi hơn mọi cảnh báo khác, vì đây là chỗ dễ làm hỏng số liệu nhất.
+Phần mềm tách sẵn hai trường hợp theo khoảng cách thời gian:
+
+| Cách nhau | Kết luận | Bạn bấm |
+|---|---|---|
+| **Dưới 12 tiếng** ⛔ | Nhiều khả năng thợ nhập hai lần | *Đơn nhập trùng — xoá* (bấm hai lần mới xoá thật) |
+| **Từ 12 tiếng trở lên** 🔁 | Khách cũ gọi lại | *Khách cũ gọi lại* |
+
+Thẻ hiện luôn đơn cũ để bạn đối chiếu: ngày giờ, dịch vụ, tiền công, nguồn lần
+trước. Còn nếu đúng là hai người khác nhau (thợ bấm nhầm số) thì bấm *Hai khách
+khác nhau*, cảnh báo tắt đi.
+
+**Vì sao phải nổi đến vậy:** khách cũ gọi lại **không tốn đồng quảng cáo nào**.
+Gán nhầm họ vào Google Ads là cho kênh đó ăn ké một cuộc gọi nó không trả tiền —
+CPA đẹp giả, rồi bạn tăng ngân sách dựa trên con số sai. Bấm *Khách cũ gọi lại*
+sẽ gán nguồn "Khách cũ / giới thiệu" (chi phí 0đ) và tách họ khỏi phép tính.
+
+Nhóm khách cũ cũng thường có chính sách riêng (giá ưu đãi, bảo hành, chăm sóc
+định kỳ), nên biết ngay lúc duyệt là biết đúng lúc cần biết.
 
 **Gán nguồn nhanh:**
 
@@ -80,8 +102,10 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 
 ### Giai đoạn 3 — Bản thật, phần phân tích (ước 4–5 ngày làm)
 
-- **Màn hình "Duyệt đơn"**: kiểm tra tự động, gán nguồn lẻ và hàng loạt, gợi ý
-  nguồn cho khách cũ, sửa mọi trường tại chỗ
+- **Màn hình "Duyệt đơn"**: kiểm tra tự động, cảnh báo đỏ khi trùng số điện thoại
+  (tách nhập trùng với khách cũ gọi lại), gán nguồn lẻ và hàng loạt, sửa mọi
+  trường tại chỗ, xoá đơn trùng
+- **Bảng khách cũ quay lại**: số lượt, doanh thu, tỷ lệ chốt so với khách mới
 - Toàn bộ biểu đồ trong demo, chạy trên dữ liệu thật
 - Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
 - Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS

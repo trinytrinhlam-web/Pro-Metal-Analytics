@@ -179,6 +179,25 @@ tbody tr:last-child td{border-bottom:0}
 .banner button{margin-left:auto;border:0;background:var(--ink);color:var(--panel);border-radius:9px;padding:8px 14px;font-weight:700;font-size:13px}
 .rv{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:13px 14px;margin-bottom:11px}
 .rv.hot{border-color:var(--warn);border-left:4px solid var(--warn)}
+.rv.crit{border-color:var(--crit);border-left:4px solid var(--crit);box-shadow:0 0 0 3px color-mix(in srgb,var(--crit) 12%,transparent)}
+.dup{background:var(--crit-bg);border:1.5px solid var(--crit);border-radius:12px;padding:12px 14px;margin-top:11px}
+.dup h4{margin:0 0 6px;font-size:13.5px;font-family:Archivo,sans-serif;font-weight:800;color:var(--crit);
+  display:flex;gap:7px;align-items:center;letter-spacing:.01em}
+.dup .old{font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+  border-radius:9px;padding:9px 11px;margin-bottom:10px}
+.dup .old b{font-weight:700}
+.dup .old span{color:var(--ink3)}
+.dup .acts{display:flex;gap:8px;flex-wrap:wrap}
+.dup .acts button{border:1.5px solid var(--line2);background:var(--panel);border-radius:10px;
+  padding:9px 13px;font-weight:700;font-size:13px;line-height:1.25;text-align:left}
+.dup .acts button small{display:block;font-weight:500;font-size:11px;color:var(--ink3);margin-top:2px}
+.dup .acts .pri{border-color:var(--good);background:var(--good-bg)}
+.dup .acts .del{border-color:var(--crit);color:var(--crit)}
+.kcu{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.kcu .b{border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:var(--panel2)}
+.kcu .b .k{font-size:11.5px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.kcu .b .v{font-family:Archivo,sans-serif;font-weight:800;font-size:22px;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.kcu .b .s{font-size:12px;color:var(--ink2)}
 .rv.done{opacity:.62}
 .rv-h{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
 .rv-h .meta{flex:1;min-width:170px}
@@ -303,14 +322,34 @@ function dayStart(d){var x=new Date(d);x.setHours(0,0,0,0);return x}
   LEADS.sort(function(a,b){return a.t-b.t});
 })();
 
+/* Khoảng 13% lượt gọi là khách cũ quay lại — dùng lại số điện thoại của một
+   khách trước đó. Nhóm này chốt cao hơn và đơn nhỉnh hơn vì đã tin nhau. */
+(function khachQuayLai(){
+  var r2=rng(77001), bd=Math.floor(LEADS.length*0.3);
+  for(var i=bd;i<LEADS.length;i++){
+    if(r2()>=0.13) continue;
+    var cu=LEADS[Math.floor(r2()*i*0.75)];
+    if(!cu||(LEADS[i].t-cu.t)/36e5<24) continue;
+    LEADS[i].sdt=cu.sdt; LEADS[i].ten=cu.ten; LEADS[i].gt=cu.gt;
+    if(r2()<0.7){
+      LEADS[i].tt="chot"; LEADS[i].lydo=null;
+      LEADS[i].rev=Math.round((cu.rev||3600000)*(0.85+r2()*0.85)/1e5)*1e5;
+    }
+  }
+})();
+
 /* Đơn cũ coi như admin đã duyệt xong (đã gán nguồn). Đơn 3 ngày gần đây
    còn chờ duyệt: thợ không nhập nguồn nên hotline để trống. */
 (function choDuyet(){
   var moc=dayStart(new Date(NOW.getTime()-3*864e5)).getTime();
   LEADS.forEach(function(l){ l.duyet = l.t.getTime() < moc; if(!l.duyet) l.hotline=null; });
-  var cho=LEADS.filter(function(l){return !l.duyet}), cu=LEADS.filter(function(l){return l.duyet});
-  /* vài khách cũ gọi lại -> phần duyệt sẽ gợi ý được nguồn lần trước */
-  [1,6,11].forEach(function(i,k){ if(cho[i]&&cu[cu.length-1-k*17]){ cho[i].sdt=cu[cu.length-1-k*17].sdt; cho[i].ten=cu[cu.length-1-k*17].ten; } });
+  var cho=LEADS.filter(function(l){return !l.duyet});
+  /* một ca thợ nhập trùng thật: cùng số, cách nhau 3 tiếng */
+  if(cho[12]&&cho[13]){
+    cho[13].sdt=cho[12].sdt; cho[13].ten=cho[12].ten; cho[13].gt=cho[12].gt;
+    cho[13].t=new Date(cho[12].t.getTime()+3*36e5);
+    LEADS.sort(function(a,b){return a.t-b.t});
+  }
   /* vài lỗi nhập liệu thật hay gặp, để thấy phần kiểm tra chạy */
   if(cho[2]) cho[2].sdt=cho[2].sdt.slice(0,8);
   if(cho[8]) cho[8].sdt="1"+cho[8].sdt.slice(1);
@@ -524,13 +563,21 @@ function loc(k){
 }
 function nguonKhop(l){return !AF.nguon || (AF.nguon==="__none__" ? !l.hotline : l.hotline===AF.nguon)}
 function songay(k){var r=kyRange(k);return Math.max(1,Math.round((dayStart(r[1])-dayStart(r[0]))/864e5)+1)}
+/* Khách cũ gọi lại không tốn đồng quảng cáo nào, nên phải để riêng: gộp vào sẽ làm
+   CPL và CPA của kênh trả tiền đẹp giả. CPL/CPA/ROAS chỉ tính trên khách mới. */
 function agg(ls,days){
   var chot=ls.filter(function(l){return l.tt==="chot"});
   var dt=chot.reduce(function(s,l){return s+(l.rev||0)},0);
+  var moi=ls.filter(function(l){return !laKhachCu(l)});
+  var chotMoi=moi.filter(function(l){return l.tt==="chot"});
+  var dtMoi=chotMoi.reduce(function(s,l){return s+(l.rev||0)},0);
   var chi=AF.nguon==="__none__"?0:HOTLINES.reduce(function(s,h){return (AF.nguon&&h.id!==AF.nguon)?s:s+h.chi/30*days},0);
   return {n:ls.length,chot:chot.length,ty:pc(chot.length,ls.length),dt:dt,
-          tb:chot.length?dt/chot.length:0,chi:chi,cpl:ls.length?chi/ls.length:0,
-          cpa:chot.length?chi/chot.length:0,roas:chi?dt/chi:0};
+          tb:chot.length?dt/chot.length:0,chi:chi,
+          moi:moi.length,cu:ls.length-moi.length,dtCu:dt-dtMoi,dtMoi:dtMoi,
+          cpl:moi.length?chi/moi.length:0,
+          cpa:chotMoi.length?chi/chotMoi.length:0,
+          roas:chi?dtMoi/chi:0};
 }
 function truoc(k){
   var r=kyRange(k),len=r[1]-r[0];
@@ -574,11 +621,11 @@ function tplPhanTich(){
    +kpi("Đã chốt",A.chot+' <span style="font-size:14px;color:var(--ink3)">('+String(A.ty).replace(".",",")+'%)</span>',delta(A.ty,P.ty,"tỷ lệ chốt"))
    +kpi("Doanh thu",ngan(A.dt),delta(A.dt,P.dt))
    +kpi("Trung bình / đơn",ngan(A.tb),delta(A.tb,P.tb))
-   +kpi("Chi phí quảng cáo",ngan(A.chi),'<span class="d flat">'+vnd(Math.round(A.cpl))+" / khách</span>")
+   +kpi("Chi phí quảng cáo",ngan(A.chi),'<span class="d flat">'+vnd(Math.round(A.cpl))+" / khách mới</span>")
    +kpi("Chi phí / đơn chốt",ngan(A.cpa),delta(A.cpa,P.cpa,"CPA",true))
-   +kpi("ROAS",(Math.round(A.roas*10)/10).toString().replace(".",",")+"×",'<span class="d '+(A.roas>=4?"up":"dn")+'">mỗi 1đ quảng cáo thu về '+Math.round(A.roas)+"đ</span>")
+   +kpi("ROAS khách mới",fpc(Math.round(A.roas*10)/10)+"×",'<span class="d '+(A.roas>=4?"up":"dn")+'">mỗi 1đ quảng cáo thu về '+Math.round(A.roas)+"đ</span>")
   +'</div>'
-  +panelHeat(ls)+panelNguon(ls,days)+panelXu(ls)
+  +panelHeat(ls)+panelNguon(ls,days)+panelKhachCu(ls,A)+panelXu(ls)
   +'<div class="grid2">'+panelGioiTinh(ls)+panelDichVu(ls)+'</div>'
   +'<div class="grid2">'+panelKhuVuc(ls)+panelTuChoi(ls)+'</div>'
   +panelGoiY(ls,days,A)+panelBang(ls);
@@ -615,26 +662,30 @@ function panelNguon(ls,days){
     var s=ls.filter(function(l){return l.hotline===h.id});
     var c=s.filter(function(l){return l.tt==="chot"});
     var dt=c.reduce(function(a,l){return a+(l.rev||0)},0), chi=h.chi/30*days;
-    return {h:h,n:s.length,c:c.length,ty:pc(c.length,s.length),dt:dt,chi:chi,
-            cpl:s.length?chi/s.length:0,cpa:c.length?chi/c.length:0,roas:chi?dt/chi:0};
+    var moi=s.filter(function(l){return !laKhachCu(l)});
+    var cm=moi.filter(function(l){return l.tt==="chot"});
+    var dtm=cm.reduce(function(a,l){return a+(l.rev||0)},0);
+    return {h:h,n:s.length,cu:s.length-moi.length,c:c.length,ty:pc(c.length,s.length),dt:dt,chi:chi,
+            cpl:moi.length?chi/moi.length:0,cpa:cm.length?chi/cm.length:0,roas:chi?dtm/chi:0};
   });
   var chuaRo=ls.filter(function(l){return !l.hotline});
   if(chuaRo.length){
     var cc=chuaRo.filter(function(l){return l.tt==="chot"});
-    rows.push({h:KHONGRO,n:chuaRo.length,c:cc.length,ty:pc(cc.length,chuaRo.length),
-      dt:cc.reduce(function(a,l){return a+(l.rev||0)},0),chi:0,cpl:0,cpa:0,roas:0});
+    rows.push({h:KHONGRO,n:chuaRo.length,cu:chuaRo.filter(laKhachCu).length,c:cc.length,
+      ty:pc(cc.length,chuaRo.length),dt:cc.reduce(function(a,l){return a+(l.rev||0)},0),
+      chi:0,cpl:0,cpa:0,roas:0});
   }
   rows=rows.filter(function(r){return r.n||r.chi});
   var maxdt=Math.max.apply(null,rows.map(function(r){return r.dt}))||1;
   return '<div class="panel"><h2>Từng số hotline mang về gì</h2>'
    +'<p class="sub">Mỗi kênh quảng cáo một số điện thoại riêng, nên tiền bỏ ra và tiền thu về khớp đúng từng kênh.</p>'
    +'<div class="scrollx"><table><thead><tr><th>Hotline / kênh</th><th class="n">Khách</th><th class="n">Chốt</th><th class="n">Tỷ lệ</th>'
-   +'<th class="n">Doanh thu</th><th style="width:110px">&nbsp;</th><th class="n">Chi phí QC</th><th class="n">Giá 1 khách</th><th class="n">Giá 1 đơn</th><th class="n">ROAS</th></tr></thead><tbody>'
+   +'<th class="n">Doanh thu</th><th style="width:110px">&nbsp;</th><th class="n">Chi phí QC</th><th class="n">Giá 1 khách mới</th><th class="n">Giá 1 đơn mới</th><th class="n">ROAS</th></tr></thead><tbody>'
    +rows.map(function(r){
      var bad=r.chi>0&&r.roas<3;
      return '<tr><td><span class="sw" style="background:'+r.h.mau+'"></span><b>'+esc(r.h.kenh)+'</b><br>'
       +'<span style="color:var(--ink3);font-size:11.5px;padding-left:17px">'+esc(r.h.so)+'</span></td>'
-      +'<td class="n">'+r.n+'</td><td class="n">'+r.c+'</td>'
+      +'<td class="n">'+r.n+(r.cu?'<br><span style="color:var(--ink3);font-size:11px;font-weight:600">'+r.cu+' khách cũ</span>':'')+'</td><td class="n">'+r.c+'</td>'
       +'<td class="n"><span class="badge '+(r.ty>=45?"b-good":r.ty>=28?"b-warn":"b-crit")+'">'+String(r.ty).replace(".",",")+'%</span></td>'
       +'<td class="n"><b>'+ngan(r.dt)+'</b></td>'
       +'<td><div class="bar"><i style="width:'+Math.round(r.dt/maxdt*100)+'%;background:'+r.h.mau+'"></i></div></td>'
@@ -643,8 +694,32 @@ function panelNguon(ls,days){
       +'<td class="n">'+(r.chi&&r.c?vnd(Math.round(r.cpa/1000)*1000):"—")+'</td>'
       +'<td class="n">'+(r.chi?'<b class="'+(bad?"dn":"up")+'">'+(Math.round(r.roas*10)/10).toString().replace(".",",")+'×</b>':"—")+'</td></tr>'}).join('')
    +'</tbody></table></div>'
-   +(chuaRo.length?'<div class="hint" style="border-left-color:var(--warn);margin-top:14px"><b>'+chuaRo.length
+   +'<div class="hint" style="margin-top:14px">Giá 1 khách, giá 1 đơn và ROAS chỉ tính trên <b>khách mới</b>. Khách cũ gọi lại không tốn đồng quảng cáo nào nên gộp vào sẽ làm các con số này đẹp giả.</div>'
+   +(chuaRo.length?'<div class="hint" style="border-left-color:var(--warn);margin-top:10px"><b>'+chuaRo.length
      +' khách chưa rõ nguồn.</b> Thợ không chọn kênh khi nhập, nên những khách này chưa tính được vào CPL, CPA và ROAS ở trên. Gán nguồn cho họ ở màn Cài đặt để bảng này đủ.</div>':'')
+   +'</div>';
+}
+function panelKhachCu(ls,A){
+  var cu=ls.filter(laKhachCu), cuChot=cu.filter(function(l){return l.tt==="chot"});
+  var tyCu=pc(cuChot.length,cu.length), tyMoi=pc(A.chot-cuChot.length,A.moi);
+  return '<div class="panel"><h2>Khách cũ quay lại</h2>'
+   +'<p class="sub">Khách gọi lại lần hai trở đi — nhận ra bằng số điện thoại. Đây là doanh thu không tốn đồng quảng cáo nào.</p>'
+   +(cu.length?'<div class="kcu">'
+     +'<div class="b"><div class="k">Lượt gọi lại</div><div class="v">'+cu.length+'</div>'
+       +'<div class="s">'+fpc(pc(cu.length,ls.length))+'% tổng số khách</div></div>'
+     +'<div class="b"><div class="k">Doanh thu</div><div class="v">'+ngan(A.dtCu)+'</div>'
+       +'<div class="s">'+fpc(pc(A.dtCu,A.dt))+'% tổng doanh thu · chi phí quảng cáo 0đ</div></div>'
+     +'<div class="b"><div class="k">Tỷ lệ chốt</div><div class="v">'+fpc(tyCu)+'%</div>'
+       +'<div class="s">khách mới '+fpc(tyMoi)+'% — '
+       +(tyCu>tyMoi?"cao hơn "+fpc(Math.round((tyCu-tyMoi)*10)/10)+" điểm"
+         :tyCu<tyMoi?"thấp hơn "+fpc(Math.round((tyMoi-tyCu)*10)/10)+" điểm":"ngang nhau")+'</div></div>'
+     +'</div>'
+     +'<div class="hint" style="margin-top:14px"><b>Dùng để làm gì:</b> '
+       +(tyCu>tyMoi
+         ? "khách cũ chốt cao hơn khách mới mà không tốn đồng quảng cáo nào, nên mỗi đồng giữ chân khách cũ đang đáng giá hơn mỗi đồng kéo khách mới. "
+         : "nhóm này tuy chốt chưa cao hơn khách mới nhưng không tốn đồng quảng cáo nào, nên lãi trên mỗi đơn vẫn cao hơn hẳn. ")
+       +"Có chính sách riêng cho họ (giá ưu đãi, bảo hành, gọi chăm sóc sau 6–12 tháng) thì lợi nhuận lên mà ngân sách quảng cáo không đổi.</div>"
+     :'<p style="color:var(--ink3);font-size:13px">Chưa có khách nào gọi lại trong kỳ này.</p>')
    +'</div>';
 }
 function panelXu(ls){
@@ -759,7 +834,16 @@ function panelGoiY(ls,days,A){
   var kv=sortMap(dem(ls.filter(function(l){return l.tt==="chot"}),function(l){return l.kv}));
   if(kv.length>=2) cards.push(["b-good","Vùng nên target mạnh",
     "Đơn chốt tập trung ở <b>"+kv.slice(0,3).map(function(x){return esc(x[0])}).join(", ")+"</b>. Tách riêng một chiến dịch cho 3 quận này với giá thầu cao hơn."]);
-  /* 5. dữ liệu thiếu */
+  /* 5. khách cũ */
+  var cuL=ls.filter(laKhachCu);
+  if(cuL.length){
+    var dtCuPc=pc(A.dtCu,A.dt);
+    cards.push(["b-good","Khách cũ đang nuôi bạn",
+"<b>"+fpc(dtCuPc)+"% doanh thu</b> ("+ngan(A.dtCu)+") đến từ "+cuL.length
+      +" lượt khách gọi lại — không tốn đồng quảng cáo nào. Trước khi tăng ngân sách kéo khách mới, "
+      +"thử nhắn lại nhóm đã làm trên 6 tháng: gần như không mất chi phí mà tỷ lệ chốt thường cao hơn."]);
+  }
+  /* 6. dữ liệu thiếu */
   var thieu=ls.filter(function(l){return l.tt==="chot"&&!l.rev}).length;
   if(thieu) cards.push(["b-warn","Dữ liệu còn hở",
     "<b>"+thieu+" đơn đã chốt chưa điền tiền công</b> nên doanh thu và ROAS ở trên đang bị tính thiếu. Nhắc thợ mở lại đơn trong màn “Hôm nay”."]);
@@ -795,15 +879,18 @@ function bindAdmin(){
 }
 
 /* ================= DUYỆT ĐƠN ================= */
-var AV={tab:"phantich",bo:"cho",mo:{},chon:{}};
+var AV={tab:"phantich",bo:"cho",mo:{},chon:{},xoa:{}};
 function sdtSach(x){return String(x||"").replace(/\D/g,"")}
 function vanDe(l){
   var v=[], s=sdtSach(l.sdt);
   if(s.length<10) v.push(["crit","Số điện thoại thiếu số ("+s.length+"/10)"]);
   else if(s.charAt(0)!=="0") v.push(["crit","Số điện thoại sai đầu số"]);
   else {
-    var tr=LEADS.filter(function(x){return x!==l&&x.sdt===l.sdt&&Math.abs(x.t-l.t)<3*864e5});
-    if(tr.length) v.push(["warn","Trùng số với đơn "+ddmm(tr[0].t)+" "+hhmm(tr[0].t)+" — kiểm tra xem có nhập hai lần không"]);
+    var p=donTruoc(l);
+    if(p) v.push(["crit", gioCach(l,p)<12
+      ? "Trùng số với đơn "+ddmm(p.t)+" "+hhmm(p.t)+" — cách nhau "+Math.round(gioCach(l,p))+" tiếng, nhiều khả năng nhập hai lần"
+      : "KHÁCH CŨ GỌI LẠI — đã có đơn "+ddmm(p.t)+", không tốn chi phí quảng cáo",
+      gioCach(l,p)<12?"trung":"cu"]);
   }
   if(!l.hotline) v.push(["warn","Chưa gán nguồn quảng cáo","nguon"]);
   if(l.tt==="chot"&&!l.rev) v.push(["warn","Đã chốt nhưng chưa có tiền công"]);
@@ -816,10 +903,18 @@ function vanDe(l){
 /* Chưa gán nguồn là trạng thái mặc định của mọi đơn chờ duyệt, không phải lỗi.
    Chỉ lỗi thật mới làm thẻ nổi lên và lọt vào bộ lọc "Có vấn đề". */
 function nangNe(l){return vanDe(l).filter(function(x){return x[0]!=="info"&&x[2]!=="nguon"}).length}
-function goiYNguon(l){
-  var tr=LEADS.filter(function(x){return x.sdt===l.sdt&&x.t<l.t&&x.hotline});
+/* Đơn gần nhất trước đó của cùng số điện thoại. Cách nhau dưới 12 tiếng thì nhiều
+   khả năng thợ nhập hai lần; xa hơn thì là khách cũ gọi lại — hai chuyện khác hẳn
+   nhau, và khách cũ thì KHÔNG tốn đồng quảng cáo nào. */
+function donTruoc(l){
+  if(l.boQuaTrung) return null;
+  var s=sdtSach(l.sdt); if(s.length<9) return null;
+  var tr=LEADS.filter(function(x){return x!==l&&sdtSach(x.sdt)===s&&x.t<=l.t});
   return tr.length?tr[tr.length-1]:null;
 }
+function gioCach(l,p){return Math.abs(l.t-p.t)/36e5}
+function laNhapTrung(l){var p=donTruoc(l);return !!p&&gioCach(l,p)<12}
+function laKhachCu(l){var p=donTruoc(l);return !!p&&gioCach(l,p)>=12}
 function tplDuyet(){
   var ds=LEADS.slice().reverse().filter(function(l){
     return AV.bo==="cho"?!l.duyet:AV.bo==="loi"?nangNe(l):true}).slice(0,60);
@@ -843,15 +938,16 @@ function tplSelBar(n){
    +'<button class="clr" data-bulkclr="1">Bỏ chọn</button></div>';
 }
 function rvCard(l){
-  var v=vanDe(l), mo=!!AV.mo[l.id], g=l.hotline?null:goiYNguon(l), t=THO.filter(function(x){return x.id===l.tho})[0];
-  var nang=nangNe(l);
-  return '<div class="rv'+(nang&&!l.duyet?" hot":"")+(l.duyet?" done":"")+'">'
+  var v=vanDe(l), mo=!!AV.mo[l.id], t=THO.filter(function(x){return x.id===l.tho})[0];
+  var nang=nangNe(l), p=donTruoc(l);
+  return '<div class="rv'+(p&&!l.duyet?" crit":nang&&!l.duyet?" hot":"")+(l.duyet?" done":"")+'">'
    +'<div class="rv-h"><input type="checkbox" class="cbx" data-sel="'+l.id+'" id="sel-'+l.id+'"'+(AV.chon[l.id]?" checked":"")+'>'
    +'<label class="meta" for="sel-'+l.id+'"><b>'+esc(l.ten||"(chưa có tên)")+'</b>'
    +'<span>'+ddmm(l.t)+' '+hhmm(l.t)+' · '+THUNG[l.t.getDay()]+' · thợ '+esc(t?t.ten:"—")+'</span></label>'
    +(l.duyet?'<span class="badge b-good">ĐÃ DUYỆT</span>':'<span class="badge b-warn">CHỜ DUYỆT</span>')+'</div>'
    +(v.length?'<div class="issues">'+v.map(function(x){
-      return '<span class="iss iss-'+x[0]+'">'+(x[0]==="info"?"·":"⚠")+' '+esc(x[1])+'</span>'}).join('')+'</div>':'')
+      return '<span class="iss iss-'+x[0]+'">'
+        +(x[2]==="cu"?"🔁":x[2]==="trung"?"⛔":x[0]==="info"?"·":"⚠")+' '+esc(x[1])+'</span>'}).join('')+'</div>':'')
    +'<div class="rv-f">'
      +'<div><div class="lb">Số điện thoại</div><input class="inp" data-fix="sdt" data-id="'+l.id+'" inputmode="tel" value="'+esc(fmtSdt(l.sdt))+'"></div>'
      +'<div><div class="lb">Tên khách</div><input class="inp" data-fix="ten" data-id="'+l.id+'" value="'+esc(l.ten||"")+'"></div>'
@@ -860,14 +956,28 @@ function rvCard(l){
      +HOTLINES.map(function(h){return '<button class="chip" data-src="'+h.id+'" data-id="'+l.id+'" aria-pressed="'+(l.hotline===h.id)+'">'
        +'<span class="dot" style="background:'+h.mau+'"></span>'+esc(h.kenh)+'</button>'}).join('')
      +'</div>'
-     +(g?'<div class="goiy">💡 Khách cũ — lần trước ('+ddmm(g.t)+') gọi qua <b>'+esc(hl(g.hotline).kenh)+'</b>. '
-        +'<button class="ghost" style="padding:4px 10px;font-size:12px" data-src="'+g.hotline+'" data-id="'+l.id+'">Dùng nguồn này</button></div>':'')
    +'</div>'
+   +(p?tplTrung(l,p):'')
    +(mo?rvThem(l):'')
    +'<div class="rv-a">'
      +'<button class="undo" data-mo="'+l.id+'">'+(mo?"Thu gọn ▴":"Sửa thêm ▾")+'</button>'
      +(l.duyet?'<button class="undo" data-bo-duyet="'+l.id+'">Bỏ duyệt</button>'
         :'<button class="ok" data-duyet="'+l.id+'">✓ Xác nhận đơn này</button>')
+   +'</div></div>';
+}
+function tplTrung(l,p){
+  var gio=gioCach(l,p), trung=gio<12, ngay=Math.round(gio/24), xoa=AV.xoa[l.id];
+  return '<div class="dup"><h4>'+(trung?"⛔ Có thể là đơn nhập trùng":"🔁 Khách cũ gọi lại")+'</h4>'
+   +'<div class="old">Số <b>'+fmtSdt(l.sdt)+'</b> đã có đơn <b>'+ddmm(p.t)+' '+hhmm(p.t)+'</b> '
+     +'<span>(cách '+(trung?Math.round(gio)+" tiếng":ngay+" ngày")+')</span><br>'
+     +'<span>'+esc(p.dv.join(", ")||"chưa ghi dịch vụ")+' · '
+     +(p.tt==="chot"?"đã chốt"+(p.rev?" "+vnd(p.rev):" (chưa có tiền công)"):p.tt==="hoi"?"chỉ hỏi giá":"từ chối")
+     +' · nguồn '+esc(hl(p.hotline).kenh)+'</span></div>'
+   +'<div class="acts">'
+     +(trung?'':'<button class="pri" data-kcu="'+l.id+'">Khách cũ gọi lại<small>gán nguồn “Khách cũ / giới thiệu”, không tính vào chi phí quảng cáo</small></button>')
+     +'<button class="del" data-xoa="'+l.id+'">'+(xoa?"Bấm lần nữa để xoá thật":"Đơn nhập trùng — xoá")
+       +'<small>'+(xoa?"Không khôi phục lại được":"Xoá hẳn đơn này khỏi hệ thống")+'</small></button>'
+     +'<button data-boqua="'+l.id+'">Hai khách khác nhau<small>trùng số do bấm nhầm, cứ để nguyên</small></button>'
    +'</div></div>';
 }
 function rvThem(l){
@@ -900,6 +1010,15 @@ function bindDuyet(){
     var l=byId(b.dataset.id); l.tt=b.dataset.tt2; if(l.tt!=="tuchoi")l.lydo=null; render()}});
   document.querySelectorAll("[data-dv2]").forEach(function(b){b.onclick=function(){
     var l=byId(b.dataset.id), d=b.dataset.dv2, i=l.dv.indexOf(d); if(i<0)l.dv.push(d);else l.dv.splice(i,1); render()}});
+  document.querySelectorAll("[data-kcu]").forEach(function(b){b.onclick=function(){
+    var l=byId(b.dataset.kcu); l.hotline="h5"; l.duyet=true; AV.xoa={}; render()}});
+  document.querySelectorAll("[data-boqua]").forEach(function(b){b.onclick=function(){
+    byId(b.dataset.boqua).boQuaTrung=true; AV.xoa={}; render()}});
+  document.querySelectorAll("[data-xoa]").forEach(function(b){b.onclick=function(){
+    var id=b.dataset.xoa;
+    if(!AV.xoa[id]){AV.xoa={};AV.xoa[id]=true;render();return}
+    for(var i=0;i<LEADS.length;i++)if(LEADS[i].id===id){LEADS.splice(i,1);break}
+    delete AV.xoa[id]; delete AV.chon[id]; render()}});
   document.querySelectorAll("[data-duyet]").forEach(function(b){b.onclick=function(){
     var l=byId(b.dataset.duyet); l.duyet=true; delete AV.chon[l.id]; render()}});
   document.querySelectorAll("[data-bo-duyet]").forEach(function(b){b.onclick=function(){byId(b.dataset.boDuyet).duyet=false;render()}});
