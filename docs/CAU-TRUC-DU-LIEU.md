@@ -1,0 +1,126 @@
+# Cấu trúc dữ liệu
+
+Database: PostgreSQL trên Supabase. Dưới đây là SQL tạo bảng cho giai đoạn 2.
+
+## Sơ đồ
+
+```
+tho (thợ)            hotline (số điện thoại theo kênh)
+  │                      │
+  └──────┐      ┌────────┘
+         ▼      ▼
+       khach_hang (mỗi dòng = một khách gọi đến)
+
+chi_phi_quang_cao (ngân sách từng kênh theo tháng) ── ghép với hotline khi tính ROAS
+```
+
+## SQL
+
+```sql
+-- Thợ / sale
+create table tho (
+  id          uuid primary key default gen_random_uuid(),
+  ten         text not null,
+  viet_tat    text not null,                 -- 2 ký tự hiện trên avatar
+  pin         text not null,                 -- lưu dạng đã băm, không lưu số trần
+  so_dien_thoai text,
+  vai_tro     text not null default 'tho' check (vai_tro in ('tho','admin')),
+  dang_dung   boolean not null default true,
+  tao_luc     timestamptz not null default now()
+);
+
+-- Mỗi kênh quảng cáo một số hotline
+create table hotline (
+  id          uuid primary key default gen_random_uuid(),
+  so          text not null unique,          -- 0909 12 34 56
+  kenh        text not null,                 -- Google Ads / Facebook / Zalo ...
+  mau         text not null default '#2a78d6',
+  thu_tu      int  not null default 0,
+  dang_dung   boolean not null default true
+);
+
+-- Khách gọi đến
+create table khach_hang (
+  id            uuid primary key default gen_random_uuid(),
+  thoi_diem     timestamptz not null default now(),  -- máy tự điền, thợ sửa được
+  ten           text,
+  so_dien_thoai text not null,
+  gioi_tinh     text check (gioi_tinh in ('nam','nu')),
+  hotline_id    uuid references hotline(id),         -- => suy ra nguồn khách
+  dich_vu       text[] not null default '{}',
+  khu_vuc       text,
+  loai_cong_trinh text,
+  trang_thai    text not null default 'hoi_gia'
+                check (trang_thai in ('hoi_gia','da_chot','tu_choi')),
+  ly_do_tu_choi text,
+  doanh_thu     bigint,                              -- VNĐ, null = chưa biết
+  ghi_chu       text,
+  tho_id        uuid references tho(id),
+  tao_luc       timestamptz not null default now(),
+  sua_luc       timestamptz not null default now()
+);
+
+create index khach_thoi_diem_idx on khach_hang (thoi_diem desc);
+create index khach_sdt_idx       on khach_hang (so_dien_thoai);
+create index khach_hotline_idx   on khach_hang (hotline_id);
+
+-- Ngân sách quảng cáo, nhập tay mỗi tháng
+create table chi_phi_quang_cao (
+  id         uuid primary key default gen_random_uuid(),
+  hotline_id uuid not null references hotline(id),
+  thang      date not null,                  -- ngày 1 của tháng
+  so_tien    bigint not null,
+  unique (hotline_id, thang)
+);
+```
+
+## Giải thích vài chỗ
+
+**`doanh_thu` cho phép để trống.** Lúc khách gọi tới thì chưa biết giá. Để trống
+khác hẳn với số 0 — số 0 nghĩa là làm miễn phí, để trống nghĩa là chưa điền.
+Dashboard đếm riêng số đơn còn thiếu và nhắc bổ sung.
+
+**`trang_thai` chỉ có 3 giá trị.** Thêm nữa là thợ phải nghĩ lâu. "Hỏi giá" bao
+gồm cả khách đang hẹn khảo sát.
+
+**`dich_vu` là mảng.** Một đơn có thể vừa làm cổng vừa làm lan can. Khi tính
+doanh thu theo dịch vụ thì chia đều tiền cho các hạng mục trong đơn.
+
+**Không có bảng "khách hàng" riêng.** Mỗi dòng là một lần khách gọi tới. Khách
+cũ nhận ra bằng cách so số điện thoại. Làm vậy đơn giản hơn, và đúng bản chất
+việc phân tích quảng cáo — cái cần đếm là **lượt liên hệ**, không phải đầu người.
+
+**`thoi_diem` khác `tao_luc`.** `thoi_diem` là lúc khách thực sự gọi (thợ sửa
+được, ví dụ nhập bù cho hôm qua). `tao_luc` là lúc bấm Lưu, không ai sửa được —
+để biết thợ có nhập trễ hay không.
+
+## Phân quyền (RLS)
+
+```sql
+alter table khach_hang enable row level security;
+
+-- Thợ: xem và sửa đơn của chính mình trong vòng 7 ngày
+create policy tho_xem on khach_hang for select
+  using (tho_id = auth.uid() and thoi_diem > now() - interval '7 days');
+create policy tho_them on khach_hang for insert
+  with check (tho_id = auth.uid());
+create policy tho_sua on khach_hang for update
+  using (tho_id = auth.uid() and thoi_diem > now() - interval '7 days');
+
+-- Admin: toàn quyền
+create policy admin_all on khach_hang for all
+  using (exists (select 1 from tho where id = auth.uid() and vai_tro = 'admin'));
+```
+
+Thợ **không** xem được doanh thu tổng, không xem được đơn của thợ khác, không
+xoá được đơn. Sửa nhầm thì báo admin.
+
+## Danh mục cần bạn chốt
+
+Ba danh sách này nằm trong cấu hình, sửa được bất cứ lúc nào mà không phải đụng
+vào code. Bản demo đang để tạm:
+
+- **Dịch vụ**: Cửa cổng · Cửa cuốn · Lan can – ban công · Cầu thang · Khung bảo vệ · Mái tôn · Sơn – hàn vá
+- **Khu vực**: Gò Vấp · Tân Bình · Bình Thạnh · Quận 12 · Thủ Đức · Quận 7 · Tân Phú · Bình Tân · Quận 10 · Hóc Môn
+- **Loại công trình**: Nhà phố · Chung cư · Xưởng – kho · Shop – văn phòng
+- **Lý do từ chối**: Giá cao · Ở quá xa · Đã thuê thợ khác · Không liên lạc lại được · Chỉ hỏi tham khảo
