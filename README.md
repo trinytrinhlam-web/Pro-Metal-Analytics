@@ -48,6 +48,7 @@ hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (th
 | [docs/CAU-TRUC-DU-LIEU.md](docs/CAU-TRUC-DU-LIEU.md) | Các bảng dữ liệu, SQL tạo bảng, phân quyền |
 | [docs/CHI-SO-PHAN-TICH.md](docs/CHI-SO-PHAN-TICH.md) | Từng chỉ số nghĩa là gì và dùng để chỉnh quảng cáo ra sao |
 | [docs/NHAP-NHANH.md](docs/NHAP-NHANH.md) | Các cách để thợ nhập nhanh hơn hoặc không phải nhập, và chuyện domain |
+| [docs/GOOGLE-ADS.md](docs/GOOGLE-ADS.md) | Nối Google Ads: tự lấy chi phí, và gửi ngược kết quả để Google tối ưu theo doanh thu |
 | [docs/BAO-HANH.md](docs/BAO-HANH.md) | Tra cứu bảo hành, hạn từng hạng mục, danh sách gọi chăm sóc |
 | [docs/GHI-AM-AI.md](docs/GHI-AM-AI.md) | Nhập bằng giọng nói qua Gemini, và cách xoá sạch file ghi âm |
 | [docs/TRIEN-KHAI.md](docs/TRIEN-KHAI.md) | Trỏ domain, cài hotline, đưa app lên mạng |

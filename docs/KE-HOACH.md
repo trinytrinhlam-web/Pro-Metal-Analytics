@@ -123,6 +123,9 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 - Toàn bộ biểu đồ trong demo, chạy trên dữ liệu thật
 - Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
 - Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS
+- **Tự lấy chi phí từ Google Ads API** thay cho nhập tay
+- **Kéo thả CSV báo cáo cuộc gọi Google Ads** → tự khớp số điện thoại, gán nguồn
+  hàng loạt. Việc duyệt đơn hằng ngày rút còn ~2 phút mỗi tuần — xem `GOOGLE-ADS.md`
 - Xuất Excel
 - Gợi ý tối ưu quảng cáo tự động
 
@@ -131,7 +134,10 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 - Nhắc việc: khách "hỏi giá" quá 3 ngày chưa chốt → nhắc gọi lại
 - Bảng xếp hạng thợ theo tháng
 - Báo cáo tự gửi Zalo/email đầu tuần
-- Nối thẳng vào Google Ads API để khỏi nhập chi phí tay
+- **Gửi ngược chuyển đổi về Google Ads**: báo cho Google biết đơn nào chốt và bao
+  nhiêu tiền, để Google đấu giá nhắm vào khách ra tiền thay vì chỉ nhắm nhiều
+  cuộc gọi. Đây là chỗ phần mềm thành vòng lặp tự tối ưu — xem `GOOGLE-ADS.md`
+- Tương tự với Facebook Conversions API, làm sau Google
 
 ## 3. Quyết định kỹ thuật và lý do
 
