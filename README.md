@@ -11,7 +11,7 @@ Mục tiêu không chỉ là lưu tên khách, mà là **trả lời được c�
 | Phần | Ai dùng | Thiết bị | Đường dẫn dự kiến |
 |---|---|---|---|
 | Nhập khách | Thợ / sale | Điện thoại (chỉ tối ưu mobile) | `suachuacuasat.com/nhap` |
-| Phân tích | Admin (chủ) | Máy tính + điện thoại | `suachuacuasat.com/admin` |
+| Phân tích + duyệt đơn | Admin (chủ) | Máy tính + điện thoại | `suachuacuasat.com/admin` |
 
 Có thể tạo thêm đường dẫn khác tuỳ ý, ví dụ `/guikhachcusat`.
 
@@ -27,6 +27,9 @@ start demo\index.html       # Windows
 
 Demo dùng **dữ liệu mẫu do máy sinh ra** (không phải khách thật). Nhập thử một
 khách ở màn hình thợ rồi bấm sang tab Admin sẽ thấy số liệu đổi theo.
+
+Bên Admin có hai tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo)
+và **Phân tích** (biểu đồ, chỉ số).
 
 - `demo/app.html` — bản gốc, sửa ở đây
 - `demo/index.html` — bản chạy độc lập, sinh ra bằng `bash demo/build.sh`

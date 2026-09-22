@@ -44,9 +44,12 @@ không gộp chung.
 Bảng lõi của phần mềm: mỗi kênh quảng cáo đứng một dòng, có đủ khách / chốt /
 tỷ lệ / doanh thu / chi phí / CPL / CPA / ROAS.
 
-> ⚠️ Bảng này chỉ chạy được trên đơn **đã có nguồn**. Thợ không nhập nguồn khi
-> nhập khách, nên phải điền ở phía sau — xem `KE-HOACH.md` mục 1.1. Đơn chưa gán
-> hiện thành một dòng riêng "Chưa rõ nguồn" và không tính vào CPL/CPA/ROAS.
+> ⚠️ Bảng này chỉ chạy được trên đơn **đã gán nguồn**. Thợ không nhập nguồn, nên
+> bạn gán ở màn "Duyệt đơn" — xem `KE-HOACH.md` mục 1.2. Đơn chưa gán hiện thành
+> một dòng riêng "Chưa rõ nguồn" và không tính vào CPL/CPA/ROAS.
+>
+> Nghĩa là: **bỏ duyệt đơn vài ngày thì bảng này sai.** Đây là việc duy nhất của
+> phần mềm cần bạn làm đều tay.
 
 **Đọc theo thứ tự:** ROAS trước → kênh thấp nhất thì xem tỷ lệ chốt → tỷ lệ chốt
 thấp thì xem lý do từ chối của riêng kênh đó (lọc theo nguồn ở đầu trang).
@@ -92,7 +95,12 @@ trước mới biết.
 **Lưu ý:** dưới khoảng 100 khách một kỳ thì con số còn nhiễu, đừng cắt ngân sách
 vội. Nhìn xu hướng 2–3 tháng.
 
-## Quy trình đề nghị: 15 phút mỗi thứ Hai
+## Quy trình đề nghị: vài phút mỗi ngày + 15 phút mỗi thứ Hai
+
+**Mỗi ngày (2–3 phút):** mở tab **Duyệt đơn**, gán nguồn cho đơn mới, sửa chỗ nào
+phần mềm báo đỏ, xác nhận. Làm gộp cả loạt bằng cách tích chọn nhiều đơn.
+
+**Mỗi thứ Hai (15 phút):**
 
 1. Mở dashboard, chọn "7 ngày qua"
 2. Đọc khối **Nên làm gì với quảng cáo tuần này** — máy đã đọc số liệu và viết sẵn

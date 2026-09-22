@@ -57,6 +57,9 @@ create table khach_hang (
   doanh_thu     bigint,                              -- VNĐ, null = chưa biết
   ghi_chu       text,
   tho_id        uuid references tho(id),
+  da_duyet      boolean not null default false,      -- admin đã kiểm và xác nhận
+  duyet_luc     timestamptz,
+  duyet_boi     uuid references tho(id),
   tao_luc       timestamptz not null default now(),
   sua_luc       timestamptz not null default now()
 );
@@ -64,6 +67,7 @@ create table khach_hang (
 create index khach_thoi_diem_idx on khach_hang (thoi_diem desc);
 create index khach_sdt_idx       on khach_hang (so_dien_thoai);
 create index khach_hotline_idx   on khach_hang (hotline_id);
+create index khach_cho_duyet_idx on khach_hang (da_duyet) where da_duyet = false;
 
 -- Ngân sách quảng cáo, nhập tay mỗi tháng
 create table chi_phi_quang_cao (
@@ -83,8 +87,12 @@ Dashboard đếm riêng số đơn còn thiếu và nhắc bổ sung.
 
 **`hotline_id` để trống được.** Thợ không chọn nguồn khi nhập, nên đơn mới vào
 với `hotline_id = null` — nghĩa là "chưa rõ nguồn", khác hẳn với việc gán bừa
-vào một kênh nào đó. Phần điền nguồn làm sau, ở phía admin hoặc tự động từ tổng
-đài (xem `KE-HOACH.md` mục 1.1).
+vào một kênh nào đó. Admin gán sau ở màn "Duyệt đơn".
+
+**`da_duyet` là ranh giới giữa dữ liệu thô và dữ liệu dùng được.** Thợ nhập xong
+là `false`; admin kiểm và xác nhận thì thành `true`. Đơn chưa duyệt vẫn được đếm
+vào tổng số khách (vì khách có gọi thật), chỉ chưa vào được bảng so sánh kênh.
+Giữ thêm `duyet_luc` và `duyet_boi` để sau này biết ai duyệt, lúc nào.
 
 **`trang_thai` chỉ có 3 giá trị.** Thêm nữa là thợ phải nghĩ lâu. "Hỏi giá" bao
 gồm cả khách đang hẹn khảo sát.
