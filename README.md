@@ -41,6 +41,17 @@ hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (th
 - `demo/app.html` — bản gốc, sửa ở đây
 - `demo/index.html` — bản chạy độc lập, sinh ra bằng `bash demo/build.sh`
 
+## Bản thật
+
+Code ở [`web/`](web/) — Next.js + Supabase. Cài đặt: [`web/README.md`](web/README.md).
+
+```bash
+cd web && npm install
+# điền .env.local rồi:
+node scripts/tao-admin.mjs "Tên bạn" 1234
+npm run dev
+```
+
 ## Tài liệu
 
 | File | Nội dung |
@@ -72,5 +83,5 @@ git pull origin claude/compassionate-gauss-fi0nty
 - [x] Chốt yêu cầu
 - [x] Kế hoạch + cấu trúc dữ liệu
 - [x] Demo giao diện (chưa có database thật)
-- [ ] Dựng bản thật: Next.js + Supabase
+- [x] Dựng bản thật giai đoạn 2: app thợ nhập (`web/`)
 - [ ] Trỏ domain, chạy thử với khách thật

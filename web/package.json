@@ -1,0 +1,26 @@
+{
+  "name": "cua-sat-lead-radar",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test kiem-tra/logic.test.ts",
+    "tao-admin": "node scripts/tao-admin.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.58.0",
+    "next": "15.5.25",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.1",
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9",
+    "typescript": "5.9.2"
+  }
+}

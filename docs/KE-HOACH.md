@@ -96,7 +96,7 @@ cứu, hạn bảo hành, danh sách gọi chăm sóc) và **Phân tích** (7 ch
 so sánh từng hotline, biểu đồ theo ngày, giới tính, dịch vụ, khu vực, lý do từ
 chối, gợi ý tự động, bảng chi tiết).
 
-### Giai đoạn 2 — Bản thật, phần nhập liệu (ước 4–5 ngày làm)
+### Giai đoạn 2 — Bản thật, phần nhập liệu ✅ xong
 
 - Dựng Supabase: bảng, ràng buộc, phân quyền
 - Màn hình thợ chạy thật: đăng nhập PIN, lưu vào database
@@ -109,6 +109,8 @@ chối, gợi ý tự động, bảng chi tiết).
   hai cách miễn phí bỏ luôn việc gõ số điện thoại, xem `NHAP-NHANH.md`
 - **Tab Cài đặt**: admin thêm thợ, đặt mã PIN, cho thợ nghỉ; sửa hotline từng
   kênh (đổi số, đổi tên kênh, chi phí tháng, màu biểu đồ, cho nghỉ, thêm mới)
+
+Code nằm ở `web/`. Hướng dẫn cài đặt trong `web/README.md`.
 
 **Chạy thử 1–2 tuần với khách thật trước khi làm tiếp.** Dữ liệu thật sẽ cho
 thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ liệu là làm mò.
