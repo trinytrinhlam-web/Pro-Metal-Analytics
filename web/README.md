@@ -5,52 +5,74 @@ App nhập khách cho thợ, chạy thật với database. Next.js + Supabase.
 > Bản demo giao diện nằm ở `../demo` và vẫn chạy độc lập, không liên quan tới
 > thư mục này.
 
-## Chạy lần đầu
+## ⚠️ Hai chỗ khác nhau, đừng dán nhầm
+
+| Chỗ | Nhận cái gì | KHÔNG nhận |
+|---|---|---|
+| **Supabase → SQL Editor** | Chỉ lệnh SQL — nội dung file `supabase/migrations/0001_khoi_tao.sql` | `cd`, `npm`, `node`… dán vào là báo `syntax error` |
+| **Terminal / dòng lệnh** | `npm install`, `npm run dev`, `node scripts/...` | SQL |
+
+Dán nhầm cũng không hỏng gì, nó chỉ báo lỗi rồi thôi.
+
+## Cách 1 — Không cần terminal (khuyên dùng)
+
+Làm hết trên trình duyệt, không phải cài gì lên máy.
 
 ### 1. Tạo database
 
-Vào [supabase.com](https://supabase.com) → tạo project mới (gói miễn phí đủ dùng).
+[supabase.com](https://supabase.com) → **New project** (gói miễn phí đủ dùng).
 
-Mở **SQL Editor** → dán toàn bộ `supabase/migrations/0001_khoi_tao.sql` → **Run**.
+Mở **SQL Editor** → **New query** → mở file `supabase/migrations/0001_khoi_tao.sql`
+trên GitHub, copy **toàn bộ** nội dung, dán vào → bấm **Run**.
 
-### 2. Khai báo khoá
+Chạy đúng thì thấy `Success. No rows returned`.
 
-```bash
-cp .env.example .env.local
-```
+### 2. Đưa lên Vercel
 
-Điền vào `.env.local`:
+[vercel.com](https://vercel.com) → đăng nhập bằng GitHub → **Add New → Project** →
+chọn repo `Pro-Metal-Analytics`.
 
-| Biến | Lấy ở đâu |
+Quan trọng: mục **Root Directory** bấm **Edit** rồi chọn thư mục **`web`**. Không
+đổi chỗ này là Vercel không tìm thấy app.
+
+Trước khi bấm Deploy, mở **Environment Variables** và thêm bốn dòng:
+
+| Name | Value lấy ở đâu |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | cùng trang, mục **service_role** — **khoá bí mật, không đưa cho ai** |
-| `SESSION_SECRET` | tự tạo: `openssl rand -base64 32` |
-| `GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com) — để trống thì nút ghi âm tự ẩn |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → **Project URL** |
+| `SUPABASE_SERVICE_ROLE_KEY` | cùng trang, mục **service_role** — khoá bí mật, đừng đưa cho ai |
+| `SESSION_SECRET` | gõ đại một chuỗi dài ngẫu nhiên 40–60 ký tự, chữ và số lẫn lộn |
+| `GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com) → Get API key. Bỏ trống cũng được, khi đó nút ghi âm tự ẩn |
 
-### 3. Tạo tài khoản admin đầu tiên
+Bấm **Deploy**, chờ 1–2 phút.
+
+### 3. Tạo tài khoản của bạn
+
+Mở `<link-vercel-vừa-tạo>/khoi-tao` → điền tên và mã PIN 4 số → **Tạo tài khoản**.
+
+Trang này **chỉ chạy được một lần**, khi chưa có ai trong hệ thống. Tạo xong nó tự
+đóng lại, không ai dùng nó để tự cấp quyền admin được nữa.
+
+Xong. Vào `/admin` thêm thợ, `/nhap` để nhập khách.
+
+### 4. Gắn domain
+
+Vercel → Settings → Domains → thêm `app.suachuacuasat.com`, rồi thêm bản ghi DNS
+theo đúng hướng dẫn Vercel hiện ra. WordPress hiện tại không bị đụng gì.
+
+## Cách 2 — Chạy trên máy bạn
+
+Chỉ làm nếu muốn sửa code. Cần cài [Node.js](https://nodejs.org) trước.
 
 ```bash
+cd web
 npm install
-node scripts/tao-admin.mjs "Anh Lâm" 1234
+cp .env.example .env.local      # rồi mở file này điền bốn khoá như bảng trên
+npm run dev                     # mở http://localhost:3000/khoi-tao
 ```
 
-Từ lần sau bạn tự thêm thợ trong màn Cài đặt, không cần chạy script này nữa.
-
-### 4. Chạy
-
-```bash
-npm run dev      # mở http://localhost:3000/nhap
-```
-
-Nhập mã PIN vừa tạo. Vào `/admin` để thêm thợ và sửa hotline.
-
-## Đưa lên mạng
-
-Đẩy code lên GitHub rồi nối với Vercel. Nhớ khai lại bốn biến môi trường ở
-Vercel → Settings → Environment Variables (đừng đưa `.env.local` lên git).
-
-Trỏ DNS: `app.suachuacuasat.com` → CNAME → `cname.vercel-dns.com`
+Tạo tài khoản đầu tiên: mở `/khoi-tao` trên trình duyệt, hoặc nếu thích dùng dòng
+lệnh thì `node scripts/tao-admin.mjs "Anh Lâm" 1234`.
 
 ## Thợ cài lên điện thoại
 

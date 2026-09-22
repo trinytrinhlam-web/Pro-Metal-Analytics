@@ -66,7 +66,7 @@ test("phiên hết hạn thì không dùng được nữa", () => {
   const than = Buffer.from(
     JSON.stringify({ thoId: "abc", ten: "X", vaiTro: "tho", het: Date.now() - 1000 })
   ).toString("base64url");
-  const ky = createHmac("sha256", process.env.SESSION_SECRET).update(than).digest("base64url");
+  const ky = createHmac("sha256", process.env.SESSION_SECRET!).update(than).digest("base64url");
   assert.equal(docToken(`${than}.${ky}`), null);
 });
 

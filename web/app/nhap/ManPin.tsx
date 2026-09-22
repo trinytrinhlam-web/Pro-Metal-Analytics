@@ -1,10 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ManPin({ xong }: { xong: (ten: string, vaiTro: string) => void }) {
   const [pin, setPin] = useState("");
   const [loi, setLoi] = useState("");
   const [dangGui, setDangGui] = useState(false);
+  const [chuaCoAi, setChuaCoAi] = useState(false);
+
+  // Lần đầu dựng xong, bảng thợ còn trống — chỉ đường cho người dùng khỏi bí.
+  useEffect(() => {
+    fetch("/api/khoi-tao")
+      .then((r) => r.json())
+      .then((j) => setChuaCoAi(!!j.san_sang))
+      .catch(() => {});
+  }, []);
 
   async function thu(ma: string) {
     setDangGui(true);
@@ -45,6 +54,13 @@ export default function ManPin({ xong }: { xong: (ten: string, vaiTro: string) =
         <p style={{ color: "var(--ink3)", fontSize: 13, margin: 0 }}>
           Mỗi thợ một mã riêng · không cần nhớ mật khẩu
         </p>
+        {chuaCoAi && (
+          <div className="hint" style={{ textAlign: "left", marginTop: 14 }}>
+            <b>Chưa có tài khoản nào.</b>
+            <br />
+            <a href="/khoi-tao">Tạo tài khoản admin đầu tiên →</a>
+          </div>
+        )}
         <div className="pindots">
           {[0, 1, 2, 3].map((i) => (
             <i key={i} className={i < pin.length ? "on" : ""} />
