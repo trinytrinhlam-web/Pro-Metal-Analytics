@@ -46,7 +46,8 @@ create table khach_hang (
   ten           text,
   so_dien_thoai text not null,
   gioi_tinh     text check (gioi_tinh in ('nam','nu')),
-  hotline_id    uuid references hotline(id),         -- => suy ra nguồn khách
+  hotline_id    uuid references hotline(id),         -- null = chưa rõ nguồn;
+                                                      -- thợ không nhập ô này
   dich_vu       text[] not null default '{}',
   khu_vuc       text,
   loai_cong_trinh text,
@@ -79,6 +80,11 @@ create table chi_phi_quang_cao (
 **`doanh_thu` cho phép để trống.** Lúc khách gọi tới thì chưa biết giá. Để trống
 khác hẳn với số 0 — số 0 nghĩa là làm miễn phí, để trống nghĩa là chưa điền.
 Dashboard đếm riêng số đơn còn thiếu và nhắc bổ sung.
+
+**`hotline_id` để trống được.** Thợ không chọn nguồn khi nhập, nên đơn mới vào
+với `hotline_id = null` — nghĩa là "chưa rõ nguồn", khác hẳn với việc gán bừa
+vào một kênh nào đó. Phần điền nguồn làm sau, ở phía admin hoặc tự động từ tổng
+đài (xem `KE-HOACH.md` mục 1.1).
 
 **`trang_thai` chỉ có 3 giá trị.** Thêm nữa là thợ phải nghĩ lâu. "Hỏi giá" bao
 gồm cả khách đang hẹn khảo sát.

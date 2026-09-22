@@ -8,24 +8,37 @@
 | Thợ đăng nhập | Mã PIN 4–6 số, mỗi thợ một mã |
 | Quy mô | 1–5 thợ, dưới 300 đơn/tháng |
 | Trường thêm | Trạng thái đơn + lý do từ chối, Khu vực (quận), Loại công trình |
-| **Nguồn khách** | **Mỗi kênh quảng cáo một số hotline riêng.** Thợ chỉ chọn "khách gọi vào số nào", hệ thống tự suy ra nguồn — thợ không phải đoán |
+| **Nguồn khách** | **Thợ không nhập.** Mỗi kênh vẫn có một số hotline riêng, nhưng nguồn được điền ngoài form thợ — cách điền còn đang chốt (xem mục 1.1) |
 | Doanh thu | Để trống được, điền sau khi làm xong việc |
 
-### Điểm thiết kế quan trọng nhất
+### 1.1 Điểm còn phải chốt: nguồn khách điền bằng cách nào
 
 Thợ **không biết** khách đến từ Google hay Facebook — thợ chỉ thấy số điện thoại
-gọi tới. Nên phần mềm không hỏi thợ "khách từ đâu". Thay vào đó:
+gọi tới. Form nhập của thợ vì vậy **không có ô chọn nguồn**, để giữ tốc độ nhập.
 
-```
-Google Ads   → 0909 12 34 56 ─┐
-Facebook     → 0909 22 44 66 ─┤
-Zalo/Website → 0909 33 55 77 ─┼─→ thợ chỉ bấm "khách gọi vào số nào"
-Biển hiệu    → 0909 44 88 99 ─┤     → phần mềm tự biết nguồn
-Máy riêng    → khách cũ/giới thiệu ─┘
-```
+Hệ quả: đơn mới vào hệ thống ở trạng thái **"Chưa rõ nguồn"**. Bảng so sánh kênh,
+CPL, CPA và ROAS chỉ chạy trên phần dữ liệu đã có nguồn. Dashboard đếm riêng số
+đơn chưa gán và nhắc ngay dưới bảng.
 
-Đây là cách duy nhất vừa chính xác vừa không bắt thợ làm thêm việc gì.
-Đổi lại, bạn cần mua thêm sim/số cho từng kênh (xem `TRIEN-KHAI.md`).
+Ba cách điền, chọn một:
+
+| Cách | Ai làm | Công sức | Độ chính xác |
+|---|---|---|---|
+| **A. Tổng đài tự ghi** | Không ai | Cài một lần | Cao nhất |
+| **B. Admin gán ở dashboard** | Bạn | ~2 phút/ngày | Cao |
+| **C. Không theo dõi nguồn** | — | 0 | Không phân tích được quảng cáo |
+
+**Cách A** là cách nên làm: mỗi kênh một số hotline riêng, tổng đài ảo ghi lại
+cuộc gọi vào số nào, phần mềm khớp theo số điện thoại khách và tự điền nguồn.
+Không ai phải bấm gì thêm. Chi tiết trong `TRIEN-KHAI.md`.
+
+**Cách B** không cần mua gì: màn hình Admin có danh sách "Chưa rõ nguồn", bạn bấm
+một chip để gán. Làm gộp cả ngày một lượt.
+
+**Cách C** thì bỏ luôn bảng so sánh kênh — các phân tích còn lại (khung giờ, thứ
+trong tuần, giới tính, dịch vụ, khu vực, lý do từ chối, doanh thu) vẫn chạy đủ.
+
+👉 **Cần bạn chọn A, B hay C trước khi làm giai đoạn 3.**
 
 ## 2. Chia giai đoạn
 
@@ -34,7 +47,7 @@ Máy riêng    → khách cũ/giới thiệu ─┘
 Bản HTML chạy độc lập tại `demo/index.html`, dữ liệu mẫu, không có database.
 Mục đích: bạn nhìn thấy và sờ được trước khi bỏ công làm bản thật.
 
-Gồm: màn hình thợ (đăng nhập PIN, form nhập, danh sách hôm nay, sửa đơn) và
+Gồm: màn hình thợ (đăng nhập PIN, form nhập không có ô nguồn, danh sách hôm nay, sửa đơn) và
 màn hình admin (7 chỉ số tổng, bảng khung giờ × thứ, so sánh từng hotline,
 biểu đồ theo ngày, giới tính, dịch vụ, khu vực, lý do từ chối, gợi ý tự động,
 bảng chi tiết).

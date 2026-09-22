@@ -44,6 +44,10 @@ không gộp chung.
 Bảng lõi của phần mềm: mỗi kênh quảng cáo đứng một dòng, có đủ khách / chốt /
 tỷ lệ / doanh thu / chi phí / CPL / CPA / ROAS.
 
+> ⚠️ Bảng này chỉ chạy được trên đơn **đã có nguồn**. Thợ không nhập nguồn khi
+> nhập khách, nên phải điền ở phía sau — xem `KE-HOACH.md` mục 1.1. Đơn chưa gán
+> hiện thành một dòng riêng "Chưa rõ nguồn" và không tính vào CPL/CPA/ROAS.
+
 **Đọc theo thứ tự:** ROAS trước → kênh thấp nhất thì xem tỷ lệ chốt → tỷ lệ chốt
 thấp thì xem lý do từ chối của riêng kênh đó (lọc theo nguồn ở đầu trang).
 

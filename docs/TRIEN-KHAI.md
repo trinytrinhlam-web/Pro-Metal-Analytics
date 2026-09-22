@@ -2,7 +2,9 @@
 
 ## 1. Số hotline cho từng kênh
 
-Đây là việc cần làm **trước tiên**, vì toàn bộ phần phân tích quảng cáo dựa vào nó.
+Chỉ cần làm nếu bạn chọn **cách A hoặc B** ở `KE-HOACH.md` mục 1.1. Thợ không
+phải chọn số nào cả — form nhập của thợ không có ô này. Hotline chỉ phục vụ việc
+xác định nguồn ở phía sau.
 
 Mỗi kênh một số riêng, không dùng lẫn:
 
@@ -18,7 +20,9 @@ Mỗi kênh một số riêng, không dùng lẫn:
 vẫn nghe trên một điện thoại, nhưng màn hình hiện số nào gọi đến thì biết nguồn.
 
 **Cách gọn hơn:** dùng tổng đài ảo (Stringee, VoIP24h, CMC…) — khoảng vài trăm
-nghìn/tháng, có sẵn ghi âm và báo cáo cuộc gọi.
+nghìn/tháng, có sẵn ghi âm và báo cáo cuộc gọi. Đây cũng là cách duy nhất điền
+được nguồn khách **hoàn toàn tự động**: tổng đài biết khách gọi vào số nào, phần
+mềm khớp theo số điện thoại rồi tự điền, không ai phải bấm gì.
 
 > Nguyên tắc duy nhất phải giữ: **một số chỉ đăng đúng một chỗ.** In nhầm số
 > Google Ads lên biển hiệu là hỏng toàn bộ số liệu của kênh đó.
