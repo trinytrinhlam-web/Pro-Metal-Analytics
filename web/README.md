@@ -74,14 +74,41 @@ npm run dev                     # mở http://localhost:3000/khoi-tao
 Tạo tài khoản đầu tiên: mở `/khoi-tao` trên trình duyệt, hoặc nếu thích dùng dòng
 lệnh thì `node scripts/tao-admin.mjs "Anh Lâm" 1234`.
 
-## Thợ cài lên điện thoại
+## Thợ vào app bằng cách nào
 
-Gửi link cho thợ:
+**Thợ gõ link đúng một lần duy nhất — mà thật ra cũng không cần gõ.**
 
-- **Android (Chrome):** menu ⋮ → *Thêm vào màn hình chính*
-- **iPhone (Safari):** nút chia sẻ → *Thêm vào MH chính*
+Vào `/admin` → khối **Phát app cho thợ** ở đầu trang có sẵn **mã QR**. Đưa điện
+thoại thợ quét bằng camera là mở thẳng app, không gõ chữ nào.
 
-Sau đó mở ra chạy toàn màn hình như app thật. Sửa code xong thợ chỉ cần mở lại.
+Thợ làm ba việc, một lần:
+
+1. Quét mã QR (hoặc bấm link bạn gửi qua Zalo)
+2. Menu trình duyệt → **Thêm vào màn hình chính**
+   - Android (Chrome): menu ⋮
+   - iPhone (Safari): nút chia sẻ
+3. Nhập mã PIN của mình
+
+Xong. Từ đó thợ chỉ bấm biểu tượng trên màn hình chính như mọi app khác — không
+gõ link, không đăng nhập lại (máy nhớ 60 ngày). Sửa code xong thợ mở lại là có
+bản mới, không phải cài lại.
+
+Mỗi thợ trong danh sách còn có nút **Lời nhắn Zalo**: copy sẵn một đoạn có link,
+mã PIN và hướng dẫn, dán thẳng vào Zalo gửi cho thợ.
+
+### Đặt địa chỉ cho ngắn
+
+Địa chỉ gốc đã tự chuyển vào màn nhập, nên thợ không phải nhớ đường dẫn phía sau
+— chỉ cần tên miền:
+
+| Tên miền | Dài | Ghi chú |
+|---|---|---|
+| `app.suachuacuasat.com` | 21 ký tự | Rõ nghĩa, dễ nhớ |
+| `nhap.suachuacuasat.com` | 22 | Tiếng Việt hơn |
+| `n.suachuacuasat.com` | 19 | Ngắn nhất mà vẫn cùng domain |
+
+Có QR rồi thì độ dài gần như không còn quan trọng. Chọn cái nào bạn thấy dễ đọc
+cho thợ nghe qua điện thoại là được.
 
 ## Có gì trong này
 

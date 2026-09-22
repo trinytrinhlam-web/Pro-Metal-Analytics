@@ -16,6 +16,25 @@ export default function CaiDat({ ten }: { ten: string }) {
   const [pinMoi, setPinMoi] = useState("");
   const [soMoi, setSoMoi] = useState("");
   const [kenhMoi, setKenhMoi] = useState("");
+  const [diaChi, setDiaChi] = useState("");
+  const [daCopy, setDaCopy] = useState("");
+
+  // Địa chỉ app lấy từ chính trình duyệt, khỏi phải cấu hình thêm biến nào.
+  useEffect(() => setDiaChi(window.location.origin), []);
+
+  async function copyLoiNhan(tenTho: string, pin: string) {
+    const chu =
+      `Anh/chị ${tenTho} mở link này trên điện thoại:\n${diaChi}\n\n` +
+      `Mã đăng nhập: ${pin}\n\n` +
+      `Mở xong bấm menu trình duyệt chọn "Thêm vào màn hình chính" để lần sau khỏi gõ link.`;
+    try {
+      await navigator.clipboard.writeText(chu);
+      setDaCopy(tenTho);
+      setTimeout(() => setDaCopy(""), 2200);
+    } catch {
+      setLoi("Máy không cho copy. Bấm giữ để chọn rồi copy tay giúp.");
+    }
+  }
 
   const nap = useCallback(async () => {
     const [a, b] = await Promise.all([fetch("/api/admin/tho"), fetch("/api/admin/hotline")]);
@@ -50,7 +69,42 @@ export default function CaiDat({ ten }: { ten: string }) {
       <div className="scroll" style={{ paddingBottom: 40 }}>
         {loi && <div className="hint" style={{ borderLeftColor: "var(--crit)", marginBottom: 14 }}>{loi}</div>}
 
-        <h2 style={{ fontSize: 16, margin: "0 0 4px" }}>Thợ nhập liệu</h2>
+        <h2 style={{ fontSize: 16, margin: "0 0 4px" }}>Phát app cho thợ</h2>
+        <p style={{ fontSize: 12.5, color: "var(--ink3)", margin: "0 0 12px" }}>
+          Đưa điện thoại thợ quét mã này — không phải gõ chữ nào. Thợ chỉ làm một lần.
+        </p>
+        <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "flex-start",
+                      border: "1px solid var(--line)", borderRadius: 14, padding: 16, marginBottom: 12,
+                      background: "var(--panel)" }}>
+          {diaChi && (
+            <img
+              src={`/api/admin/qr?t=${encodeURIComponent(diaChi)}`}
+              alt="Mã QR mở app"
+              width={168}
+              height={168}
+              style={{ borderRadius: 10, background: "#fff", padding: 6, flex: "none" }}
+            />
+          )}
+          <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+            <div className="lb">Địa chỉ app</div>
+            <div style={{ fontFamily: "Archivo,sans-serif", fontWeight: 800, fontSize: 17,
+                          wordBreak: "break-all", marginBottom: 12 }}>
+              {diaChi.replace(/^https?:\/\//, "")}
+            </div>
+            <div className="lb">Thợ làm ba việc</div>
+            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13.5, color: "var(--ink2)", lineHeight: 1.65 }}>
+              <li>Mở camera điện thoại, chĩa vào mã QR, bấm vào link hiện ra</li>
+              <li>Bấm menu trình duyệt → <b>Thêm vào màn hình chính</b></li>
+              <li>Nhập mã PIN của mình — máy nhớ 60 ngày, không phải nhập lại</li>
+            </ol>
+            <div className="hint" style={{ marginTop: 12 }}>
+              Từ lần sau thợ chỉ bấm biểu tượng trên màn hình chính như mọi app khác.
+              Không gõ link, không đăng nhập lại.
+            </div>
+          </div>
+        </div>
+
+        <h2 style={{ fontSize: 16, margin: "24px 0 4px" }}>Thợ nhập liệu</h2>
         <p style={{ fontSize: 12.5, color: "var(--ink3)", margin: "0 0 12px" }}>
           Mỗi thợ một mã PIN riêng để biết đơn nào ai nhập. Không cần số điện thoại, không cần email.
         </p>
@@ -72,6 +126,16 @@ export default function CaiDat({ ten }: { ten: string }) {
               </button>
               <button className="chip" onClick={() => goi("/api/admin/tho", "PATCH", { id: t.id, dang_dung: !t.dang_dung })}>
                 {t.dang_dung ? "Cho nghỉ" : "Mở lại"}
+              </button>
+              <button
+                className="chip"
+                title="Copy sẵn lời nhắn kèm link và mã, dán thẳng vào Zalo"
+                onClick={() => {
+                  const p = prompt(`Mã PIN của ${t.ten} để ghi vào lời nhắn:`);
+                  if (p) copyLoiNhan(t.ten, p.replace(/\D/g, "").slice(0, 6));
+                }}
+              >
+                {daCopy === t.ten ? "✓ Đã copy" : "Lời nhắn Zalo"}
               </button>
             </span>
           </div>
