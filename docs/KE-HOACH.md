@@ -83,19 +83,22 @@ kênh (vì chưa có nguồn). Dashboard có dòng nhắc số đơn còn chờ.
 Bản HTML chạy độc lập tại `demo/index.html`, dữ liệu mẫu, không có database.
 Mục đích: bạn nhìn thấy và sờ được trước khi bỏ công làm bản thật.
 
-Gồm: màn hình thợ (đăng nhập PIN, form nhập không có ô nguồn, danh sách hôm nay,
-sửa đơn) và màn hình admin hai tab — **Duyệt đơn** (hàng chờ, kiểm tra tự động,
-gán nguồn lẻ và hàng loạt) và **Phân tích** (7 chỉ số tổng, bảng khung giờ × thứ,
+Gồm: màn hình thợ (đăng nhập PIN, **nhập bằng giọng nói**, form nhập không có ô
+nguồn, danh sách hôm nay, sửa đơn) và màn hình admin ba tab — **Duyệt đơn** (hàng
+chờ, kiểm tra tự động, gán nguồn lẻ và hàng loạt), **Khách cũ & bảo hành** (tra
+cứu, hạn bảo hành, danh sách gọi chăm sóc) và **Phân tích** (7 chỉ số tổng, bảng khung giờ × thứ,
 so sánh từng hotline, biểu đồ theo ngày, giới tính, dịch vụ, khu vực, lý do từ
 chối, gợi ý tự động, bảng chi tiết).
 
-### Giai đoạn 2 — Bản thật, phần nhập liệu (ước 3–4 ngày làm)
+### Giai đoạn 2 — Bản thật, phần nhập liệu (ước 4–5 ngày làm)
 
 - Dựng Supabase: bảng, ràng buộc, phân quyền
 - Màn hình thợ chạy thật: đăng nhập PIN, lưu vào database
 - PWA: cài được như app lên màn hình chính, mất sóng vẫn nhập được, có sóng tự gửi
 - Màn "Hôm nay": sửa đơn, bổ sung tiền công
 - Nhận diện khách cũ theo số điện thoại
+- **Nhập bằng giọng nói**: thợ đọc, Gemini điền vào form, thợ kiểm rồi lưu, xoá
+  file ghi âm ngay — xem `GHI-AM-AI.md`
 
 **Chạy thử 1–2 tuần với khách thật trước khi làm tiếp.** Dữ liệu thật sẽ cho
 thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ liệu là làm mò.
@@ -106,6 +109,8 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
   (tách nhập trùng với khách cũ gọi lại), gán nguồn lẻ và hàng loạt, sửa mọi
   trường tại chỗ, xoá đơn trùng
 - **Bảng khách cũ quay lại**: số lượt, doanh thu, tỷ lệ chốt so với khách mới
+- **Tab "Khách cũ & bảo hành"**: tra cứu theo số điện thoại, hạn bảo hành từng
+  hạng mục, danh sách sắp hết hạn cần gọi, ghi nhận lần bảo hành — xem `BAO-HANH.md`
 - Toàn bộ biểu đồ trong demo, chạy trên dữ liệu thật
 - Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
 - Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS
@@ -143,6 +148,8 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 
 1. Xem demo, nói chỗ nào cần sửa
 2. Chốt danh sách dịch vụ đúng với nghề của bạn (demo đang để 7 loại)
+2b. **Chốt thời hạn bảo hành thật của từng hạng mục** (demo đang để tạm, xem `BAO-HANH.md`)
+2c. **Quyết có giữ lại phần chữ máy nghe được không** (xem cuối `GHI-AM-AI.md`)
 3. Chốt danh sách quận/huyện bạn nhận việc
 4. Chuẩn bị số hotline cho từng kênh
 5. Cho biết ngân sách quảng cáo hiện tại từng kênh/tháng

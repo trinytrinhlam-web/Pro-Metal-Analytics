@@ -129,6 +129,16 @@ create policy admin_all on khach_hang for all
 Thợ **không** xem được doanh thu tổng, không xem được đơn của thợ khác, không
 xoá được đơn. Sửa nhầm thì báo admin.
 
+## Bảng cho bảo hành và ghi âm
+
+Xem chi tiết trong `BAO-HANH.md` (bảng `bao_hanh_dich_vu`, `don_hang_muc`,
+`bao_hanh_log`) và `GHI-AM-AI.md` (kho lưu tạm file ghi âm, xoá sau khi thợ
+xác nhận).
+
+Điểm cần nhớ: **thời hạn bảo hành phải chép cứng vào từng hạng mục lúc tạo đơn**,
+không tính lại từ bảng cấu hình. Đổi chính sách về sau thì chỉ ảnh hưởng khách mới,
+không rút bảo hành của khách đã làm.
+
 ## Danh mục cần bạn chốt
 
 Ba danh sách này nằm trong cấu hình, sửa được bất cứ lúc nào mà không phải đụng

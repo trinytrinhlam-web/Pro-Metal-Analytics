@@ -10,8 +10,8 @@ Mục tiêu không chỉ là lưu tên khách, mà là **trả lời được c�
 
 | Phần | Ai dùng | Thiết bị | Đường dẫn dự kiến |
 |---|---|---|---|
-| Nhập khách | Thợ / sale | Điện thoại (chỉ tối ưu mobile) | `suachuacuasat.com/nhap` |
-| Phân tích + duyệt đơn | Admin (chủ) | Máy tính + điện thoại | `suachuacuasat.com/admin` |
+| Nhập khách (có giọng nói) | Thợ / sale | Điện thoại (chỉ tối ưu mobile) | `suachuacuasat.com/nhap` |
+| Duyệt đơn + bảo hành + phân tích | Admin (chủ) | Máy tính + điện thoại | `suachuacuasat.com/admin` |
 
 Có thể tạo thêm đường dẫn khác tuỳ ý, ví dụ `/guikhachcusat`.
 
@@ -28,8 +28,12 @@ start demo\index.html       # Windows
 Demo dùng **dữ liệu mẫu do máy sinh ra** (không phải khách thật). Nhập thử một
 khách ở màn hình thợ rồi bấm sang tab Admin sẽ thấy số liệu đổi theo.
 
-Bên Admin có hai tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo)
-và **Phân tích** (biểu đồ, chỉ số).
+Màn hình thợ có nút **🎤 Nói cho nhanh** ở đầu trang: bấm, đọc một hơi, máy điền
+vào form (bản demo dùng câu mẫu, bản thật gọi Gemini).
+
+Bên Admin có ba tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo),
+**Khách cũ & bảo hành** (tra cứu theo số điện thoại, hạn bảo hành, danh sách sắp
+hết hạn) và **Phân tích** (biểu đồ, chỉ số).
 
 - `demo/app.html` — bản gốc, sửa ở đây
 - `demo/index.html` — bản chạy độc lập, sinh ra bằng `bash demo/build.sh`
@@ -41,6 +45,8 @@ và **Phân tích** (biểu đồ, chỉ số).
 | [docs/KE-HOACH.md](docs/KE-HOACH.md) | Kế hoạch làm, chia giai đoạn, phạm vi từng giai đoạn |
 | [docs/CAU-TRUC-DU-LIEU.md](docs/CAU-TRUC-DU-LIEU.md) | Các bảng dữ liệu, SQL tạo bảng, phân quyền |
 | [docs/CHI-SO-PHAN-TICH.md](docs/CHI-SO-PHAN-TICH.md) | Từng chỉ số nghĩa là gì và dùng để chỉnh quảng cáo ra sao |
+| [docs/BAO-HANH.md](docs/BAO-HANH.md) | Tra cứu bảo hành, hạn từng hạng mục, danh sách gọi chăm sóc |
+| [docs/GHI-AM-AI.md](docs/GHI-AM-AI.md) | Nhập bằng giọng nói qua Gemini, và cách xoá sạch file ghi âm |
 | [docs/TRIEN-KHAI.md](docs/TRIEN-KHAI.md) | Trỏ domain, cài hotline, đưa app lên mạng |
 
 ## Làm việc trên 2 máy
