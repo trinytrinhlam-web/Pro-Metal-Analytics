@@ -31,12 +31,13 @@ create table tho (
 -- cá nhân càng đỡ phải lo giữ. Chữ viết tắt trên avatar suy từ tên, không lưu.
 -- Hệ thống khởi tạo với đúng một thợ demo; admin tự thêm thợ thật trong Cài đặt.
 
--- Mỗi kênh quảng cáo một số hotline
+-- Mỗi kênh quảng cáo một số hotline. Sửa được bất cứ lúc nào trong Cài đặt.
 create table hotline (
   id          uuid primary key default gen_random_uuid(),
-  so          text not null unique,          -- 0909 12 34 56
+  so          text not null unique,          -- 0909 12 34 56, đổi được
   kenh        text not null,                 -- Google Ads / Facebook / Zalo ...
   mau         text not null default '#2a78d6',
+  chi_phi_thang bigint not null default 0,   -- ngân sách tháng hiện tại
   thu_tu      int  not null default 0,
   dang_dung   boolean not null default true
 );
@@ -86,6 +87,27 @@ create table chi_phi_quang_cao (
 **`doanh_thu` cho phép để trống.** Lúc khách gọi tới thì chưa biết giá. Để trống
 khác hẳn với số 0 — số 0 nghĩa là làm miễn phí, để trống nghĩa là chưa điền.
 Dashboard đếm riêng số đơn còn thiếu và nhắc bổ sung.
+
+### Đổi số hotline mà không mất lịch sử
+
+Đây là lý do `khach_hang` giữ `hotline_id` chứ không chép dãy số vào đơn.
+
+| Tình huống | Làm gì | Lịch sử |
+|---|---|---|
+| Google Ads đổi sang số mới | Sửa `so` của đúng dòng đó | Giữ nguyên — đơn cũ vẫn ở Google Ads |
+| Số mới dùng cho kênh khác | Thêm dòng hotline mới | Hai kênh tách bạch |
+| Số cũ thôi không dùng | `dang_dung = false` | Giữ nguyên, chỉ ẩn khỏi chỗ gán nguồn |
+
+Hotline đã `dang_dung = false` biến khỏi chip gán nguồn, thanh gán hàng
+loạt và ô chọn khi nhập CSV — nhưng **vẫn còn** trong bộ lọc và bảng so sánh kênh,
+kèm chữ *(ngừng dùng)*, để xem lại số liệu cũ.
+
+Chỉ **xoá hẳn** được hotline chưa có đơn nào gắn vào, và phải bấm hai lần. Có đơn
+rồi thì chỉ cho nghỉ, không cho xoá — xoá là mất nguồn của đơn cũ.
+
+**Màu trên biểu đồ chọn trong năm màu có sẵn, không cho gõ mã màu tự do.** Năm màu
+đó đã kiểm để người mù màu vẫn phân biệt được và đọc rõ ở cả nền sáng lẫn nền tối.
+Cho gõ tự do là biểu đồ hỏng lúc nào không biết.
 
 **`hotline_id` để trống được.** Thợ không chọn nguồn khi nhập, nên đơn mới vào
 với `hotline_id = null` — nghĩa là "chưa rõ nguồn", khác hẳn với việc gán bừa

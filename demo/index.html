@@ -284,6 +284,19 @@ tbody tr:last-child td{border-bottom:0}
 .pill{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
 .p-gan{background:var(--good-bg);color:var(--ink)}
 .p-sua{background:var(--warn-bg);color:var(--ink)}
+.hrow{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:12px 13px;margin-bottom:9px}
+.hrow.off{opacity:.55}
+.hrow .hd2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.hrow .hd2 .sw{width:13px;height:13px;border-radius:4px;margin:0;flex:none}
+.hrow .hd2 .n{flex:1;min-width:120px;font-size:12.5px;color:var(--ink3)}
+.hrow .hd2 button{border:1px solid var(--line2);background:var(--panel);border-radius:9px;padding:6px 11px;font-size:12.5px;font-weight:600}
+.hrow .hd2 button.del{color:var(--crit);border-color:var(--crit)}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.hgrid .lb{margin-bottom:5px}
+.hgrid input,.hgrid select{width:100%;background:var(--panel);border:1.5px solid var(--line2);border-radius:10px;
+  padding:9px 11px;font:inherit;font-size:14px;color:var(--ink)}
+.hgrid input:focus,.hgrid select:focus{border-color:var(--accent-br);outline:none}
+.hgrid .tien{font-variant-numeric:tabular-nums}
 .p-moi{background:var(--warn-bg);color:var(--ink)}
 .p-bo{background:var(--panel2);color:var(--ink3)}
 .kh{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-bottom:10px;overflow:hidden}
@@ -364,13 +377,21 @@ tbody tr:last-child td{border-bottom:0}
 (function(){
 "use strict";
 /* ============ Dữ liệu nền ============ */
+/* Đơn gắn với id của hotline, không gắn với dãy số. Nên đổi số cho cùng một kênh
+   thì toàn bộ lịch sử giữ nguyên. Số mới cho kênh khác thì thêm dòng mới. */
 var HOTLINES=[
- {id:"h1",so:"0909 12 34 56",kenh:"Google Ads",mau:"var(--s1)",chi:12000000},
- {id:"h2",so:"0909 22 44 66",kenh:"Facebook",mau:"var(--s2)",chi:8400000},
- {id:"h3",so:"0909 33 55 77",kenh:"Zalo / Website",mau:"var(--s3)",chi:2200000},
- {id:"h4",so:"0909 44 88 99",kenh:"Biển hiệu & xe",mau:"var(--s4)",chi:1500000},
- {id:"h5",so:"Máy riêng của thợ",kenh:"Khách cũ / giới thiệu",mau:"var(--s5)",chi:0}
-];
+ {id:"h1",so:"0909 12 34 56",kenh:"Google Ads",mau:"var(--s1)",chi:12000000,dung:true},
+ {id:"h2",so:"0909 22 44 66",kenh:"Facebook",mau:"var(--s2)",chi:8400000,dung:true},
+ {id:"h3",so:"0909 33 55 77",kenh:"Zalo / Website",mau:"var(--s3)",chi:2200000,dung:true},
+ {id:"h4",so:"0909 44 88 99",kenh:"Biển hiệu & xe",mau:"var(--s4)",chi:1500000,dung:true},
+ {id:"h5",so:"Máy riêng của thợ",kenh:"Khách cũ / giới thiệu",mau:"var(--s5)",chi:0,dung:true}
+], hlSeq=5;
+/* Năm màu này đã kiểm để người mù màu vẫn phân biệt được trên biểu đồ, và đọc
+   được ở cả nền sáng lẫn nền tối. Chỉ cho chọn trong số này, đừng cho gõ mã màu. */
+var MAUCHON=[["var(--s1)","Xanh dương"],["var(--s2)","Cam"],["var(--s3)","Xanh lá"],
+             ["var(--s4)","Vàng"],["var(--s5)","Hồng"]];
+function hlDung(){return HOTLINES.filter(function(h){return h.dung})}
+function demDon(id){return LEADS.filter(function(l){return l.hotline===id}).length}
 /* Lấy từ danh mục dịch vụ trên suachuacuasat.com */
 var DICHVU=["Sửa cửa sắt","Sửa cửa kéo","Cửa cuốn","Làm cửa – cổng sắt","Cầu thang – lan can sắt",
             "Inox (cửa, cầu thang, lan can)","Mái hiên – mái che","Nhôm kính","Vách ngăn panel","Hàn sắt tại nhà"];
@@ -857,7 +878,7 @@ function tplPhanTich(){
    +'<select id="a-ky">'+[["7","7 ngày qua"],["30","30 ngày qua"],["thang","Tháng này"],["truoc","Tháng trước"]].map(function(o){
       return '<option value="'+o[0]+'"'+(AF.ky===o[0]?" selected":"")+'>'+o[1]+'</option>'}).join('')+'</select>'
    +'<select id="a-nguon"><option value="">Tất cả nguồn</option>'+HOTLINES.map(function(h){
-      return '<option value="'+h.id+'"'+(AF.nguon===h.id?" selected":"")+'>'+esc(h.kenh)+'</option>'}).join('')
+      return '<option value="'+h.id+'"'+(AF.nguon===h.id?" selected":"")+'>'+esc(h.kenh)+(h.dung?"":" (ngừng dùng)")+'</option>'}).join('')
       +'<option value="__none__"'+(AF.nguon==="__none__"?" selected":"")+'>Chưa rõ nguồn</option></select>'
    +'<select id="a-tho"><option value="">Tất cả thợ</option>'+THO.map(function(t){
       return '<option value="'+t.id+'"'+(AF.tho===t.id?" selected":"")+'>'+esc(t.ten)+'</option>'}).join('')+'</select>'
@@ -931,7 +952,7 @@ function panelNguon(ls,days){
    +rows.map(function(r){
      var bad=r.chi>0&&r.roas<3;
      return '<tr><td><span class="sw" style="background:'+r.h.mau+'"></span><b>'+esc(r.h.kenh)+'</b><br>'
-      +'<span style="color:var(--ink3);font-size:11.5px;padding-left:17px">'+esc(r.h.so)+'</span></td>'
+      +'<span style="color:var(--ink3);font-size:11.5px;padding-left:17px">'+esc(r.h.so)+(r.h.dung===false?" · ngừng dùng":"")+'</span></td>'
       +'<td class="n">'+r.n+(r.cu?'<br><span style="color:var(--ink3);font-size:11px;font-weight:600">'+r.cu+' khách cũ</span>':'')+'</td><td class="n">'+r.c+'</td>'
       +'<td class="n"><span class="badge '+(r.ty>=45?"b-good":r.ty>=28?"b-warn":"b-crit")+'">'+String(r.ty).replace(".",",")+'%</span></td>'
       +'<td class="n"><b>'+ngan(r.dt)+'</b></td>'
@@ -1129,6 +1150,7 @@ function bindAdmin(){
 
 /* ================= DUYỆT ĐƠN ================= */
 var AV={tab:"phantich",bo:"cho",mo:{},chon:{},xoa:{},tim:"",bhLoc:"tat",moKH:{},thoLoi:"",thoTen:"",thoPin:"",
+  hlLoi:"",hlSo:"",hlKenh:"",hlXoa:"",
   imp:{mo:false,raw:"",kq:null,nguon:"h1",taoNhap:true,xong:null,loi:""}};
 function sdtSach(x){return String(x||"").replace(/\D/g,"")}
 function vanDe(l){
@@ -1298,7 +1320,7 @@ function tplNhapCSV(){
      +'</tbody></table></div>'
      +(k.ds.length>10?'<p class="s" style="margin:9px 0 0">…và '+(k.ds.length-10)+' dòng nữa.</p>':'')
      +'<div class="imbar"><span style="font-size:13px">Gán vào nguồn:</span>'
-       +'<select id="im-nguon">'+HOTLINES.map(function(h){return '<option value="'+h.id+'"'+(im.nguon===h.id?" selected":"")+'>'+esc(h.kenh)+'</option>'}).join('')+'</select>'
+       +'<select id="im-nguon">'+hlDung().map(function(h){return '<option value="'+h.id+'"'+(im.nguon===h.id?" selected":"")+'>'+esc(h.kenh)+'</option>'}).join('')+'</select>'
        +'<button class="go" data-imok="1">Áp dụng</button>'
        +'<button class="ghost" data-imreset="1">Huỷ</button></div></div>';
   }
@@ -1363,8 +1385,81 @@ function bindNhapCSV(){
 
 /* ============= CÀI ĐẶT ============= */
 function pinTrung(p,boQua){return THO.some(function(t){return t.pin===p&&t.id!==boQua})}
+function tplHotline(){
+  return '<div class="panel"><h2>Hotline theo kênh</h2>'
+   +'<p class="sub">Mỗi kênh quảng cáo một số riêng. Sửa được bất cứ lúc nào — đổi số, thêm kênh, cho số cũ nghỉ.</p>'
+   +'<div class="hint" style="margin-bottom:14px"><b>Đổi số mà không mất lịch sử:</b> đơn cũ gắn với <i>kênh</i> chứ không gắn với dãy số. Nên khi bạn đổi số của Google Ads sang số mới, toàn bộ đơn cũ vẫn nằm đúng ở Google Ads. Chỉ khi số mới dùng cho <i>một kênh khác</i> thì mới bấm <b>Thêm hotline</b>.</div>'
+   +HOTLINES.map(hlRow).join('')
+   +(AV.hlLoi?'<div class="hint" style="border-left-color:var(--crit);margin-top:4px">'+esc(AV.hlLoi)+'</div>':'')
+   +'<div class="addtho" style="margin-top:6px">'
+     +'<div class="c"><div class="lb">Số điện thoại mới</div><input id="h-so" placeholder="VD: 0912 99 88 77" autocomplete="off" value="'+esc(AV.hlSo)+'"></div>'
+     +'<div class="c"><div class="lb">Kênh này dùng cho</div><input id="h-kenh" placeholder="VD: TikTok" autocomplete="off" value="'+esc(AV.hlKenh)+'"></div>'
+     +'<button class="go" id="h-them">+ Thêm hotline</button></div>'
+   +'</div>';
+}
+function hlRow(h){
+  var n=demDon(h.id), xoaDuoc=n===0&&HOTLINES.length>1;
+  return '<div class="hrow'+(h.dung?'':' off')+'">'
+   +'<div class="hd2"><span class="sw" style="background:'+h.mau+'"></span>'
+     +'<span class="n">'+n+' đơn từ trước tới nay'+(h.dung?'':' · đã ngừng dùng')+'</span>'
+     +'<button data-hltat="'+h.id+'">'+(h.dung?"Cho nghỉ":"Dùng lại")+'</button>'
+     +(xoaDuoc?'<button class="del" data-hlxoa="'+h.id+'">'+(AV.hlXoa===h.id?"Bấm lần nữa để xoá":"Xoá")+'</button>':'')
+   +'</div>'
+   +'<div class="hgrid">'
+     +'<div><div class="lb">Số điện thoại</div><input data-hl="so" data-id="'+h.id+'" value="'+esc(h.so)+'"></div>'
+     +'<div><div class="lb">Kênh</div><input data-hl="kenh" data-id="'+h.id+'" value="'+esc(h.kenh)+'"></div>'
+     +'<div><div class="lb">Chi phí quảng cáo / tháng</div><input class="tien" data-hl="chi" data-id="'+h.id+'" inputmode="numeric" placeholder="0" value="'+(h.chi?Number(h.chi).toLocaleString("vi-VN"):"")+'"></div>'
+     +'<div><div class="lb">Màu trên biểu đồ</div><select data-hl="mau" data-id="'+h.id+'">'
+       +MAUCHON.map(function(m){return '<option value="'+m[0]+'"'+(h.mau===m[0]?" selected":"")+'>'+m[1]+'</option>'}).join('')
+       +'</select></div>'
+   +'</div></div>';
+}
+function bindHotline(){
+  document.querySelectorAll("[data-hl]").forEach(function(el){
+    var h=null,i; for(i=0;i<HOTLINES.length;i++) if(HOTLINES[i].id===el.dataset.id) h=HOTLINES[i];
+    if(!h)return;
+    var k=el.dataset.hl;
+    var go=function(ve){
+      if(k==="chi"){var v=el.value.replace(/\D/g,"");h.chi=v?+v:0;el.value=v?(+v).toLocaleString("vi-VN"):""}
+      else if(k==="mau"){h.mau=el.value}
+      else {
+        var t=el.value.trim();
+        if(!t){AV.hlLoi=(k==="so"?"Số điện thoại":"Tên kênh")+" không được để trống.";render();return}
+        if(k==="so"&&HOTLINES.some(function(x){return x!==h&&x.so.replace(/\s/g,"")===t.replace(/\s/g,"")})){
+          AV.hlLoi="Số "+t+" đang dùng cho kênh khác rồi.";render();return}
+        h[k]=t; AV.hlLoi="";
+      }
+      if(ve)render();
+    };
+    if(el.tagName==="SELECT")el.onchange=function(){go(true)};
+    else {el.oninput=function(){go(false)}; el.onblur=function(){go(true)}}
+  });
+  document.querySelectorAll("[data-hltat]").forEach(function(b){b.onclick=function(){
+    var h=null,i; for(i=0;i<HOTLINES.length;i++) if(HOTLINES[i].id===b.dataset.hltat) h=HOTLINES[i];
+    if(h.dung&&hlDung().length<=1){AV.hlLoi="Phải còn ít nhất một hotline đang dùng.";render();return}
+    h.dung=!h.dung; AV.hlLoi=""; AV.hlXoa=""; render()}});
+  document.querySelectorAll("[data-hlxoa]").forEach(function(b){b.onclick=function(){
+    var id=b.dataset.hlxoa;
+    if(AV.hlXoa!==id){AV.hlXoa=id;AV.hlLoi="";render();return}
+    for(var i=0;i<HOTLINES.length;i++) if(HOTLINES[i].id===id){HOTLINES.splice(i,1);break}
+    AV.hlXoa=""; render()}});
+  var them=$("#h-them");
+  var iso=$("#h-so"); if(iso)iso.oninput=function(){AV.hlSo=iso.value};
+  var ike=$("#h-kenh"); if(ike)ike.oninput=function(){AV.hlKenh=ike.value};
+  if(them)them.onclick=function(){
+    var so=(AV.hlSo||"").trim(), kenh=(AV.hlKenh||"").trim();
+    if(!so){AV.hlLoi="Chưa điền số điện thoại.";render();return}
+    if(!kenh){AV.hlLoi="Chưa điền kênh này dùng cho gì.";render();return}
+    if(HOTLINES.some(function(x){return x.so.replace(/\s/g,"")===so.replace(/\s/g,"")})){
+      AV.hlLoi="Số "+so+" đã có trong danh sách.";render();return}
+    HOTLINES.push({id:"h"+(++hlSeq),so:so,kenh:kenh,
+      mau:MAUCHON[HOTLINES.length%MAUCHON.length][0],chi:0,dung:true});
+    AV.hlLoi=""; AV.hlSo=""; AV.hlKenh=""; render();
+  };
+}
 function tplCaiDat(){
-  return '<div class="panel"><h2>Thợ nhập liệu</h2>'
+  return tplHotline()
+   +'<div class="panel"><h2>Thợ nhập liệu</h2>'
    +'<p class="sub">Mỗi thợ một mã PIN riêng để biết đơn nào ai nhập. Không cần số điện thoại, không cần email.</p>'
    +THO.map(function(t){
      var n=LEADS.filter(function(l){return l.tho===t.id}).length;
@@ -1383,7 +1478,6 @@ function tplCaiDat(){
    +'<div class="panel"><h2>Những thứ khác sửa được</h2>'
    +'<p class="sub">Toàn bộ danh mục nằm trong cấu hình, sửa không cần đụng vào code. Bản demo hiện để xem.</p>'
    +'<div class="cfg">'
-   +'<div class="r"><b>Hotline theo kênh</b><span>'+HOTLINES.map(function(h){return esc(h.so)+" → "+esc(h.kenh)}).join("<br>")+'</span></div>'
    +'<div class="r"><b>Dịch vụ</b><span>'+DICHVU.map(esc).join(" · ")+'</span></div>'
    +'<div class="r"><b>Phường / xã</b><span>'+KHUVUC.length+' đơn vị của TP.HCM (hiệu lực 01/07/2025, đã bỏ cấp quận/huyện)</span></div>'
    +'<div class="r"><b>Loại công trình</b><span>'+CONGTRINH.map(esc).join(" · ")+'</span></div>'
@@ -1393,6 +1487,7 @@ function tplCaiDat(){
    +'</div></div>';
 }
 function bindCaiDat(){
+  bindHotline();
   document.querySelectorAll("[data-tattho]").forEach(function(b){b.onclick=function(){
     var t=thoById(b.dataset.tattho); t.dung=!t.dung; AV.thoLoi=""; render()}});
   document.querySelectorAll("[data-doipin]").forEach(function(b){b.onclick=function(){
@@ -1557,7 +1652,7 @@ function tplDuyet(){
 }
 function tplSelBar(n){
   return '<div class="selbar"><b>Đã chọn '+n+' đơn</b><span style="font-size:12.5px;opacity:.8">Gán nguồn:</span>'
-   +'<div class="chips">'+HOTLINES.map(function(h){
+   +'<div class="chips">'+hlDung().map(function(h){
       return '<button class="chip" data-bulk="'+h.id+'"><span class="dot" style="background:'+h.mau+'"></span>'+esc(h.kenh)+'</button>'}).join('')+'</div>'
    +'<button class="go" data-bulkok="1">Xác nhận '+n+' đơn</button>'
    +'<button class="clr" data-bulkclr="1">Bỏ chọn</button></div>';
@@ -1581,7 +1676,7 @@ function rvCard(l){
      +'<div><div class="lb">Tên khách</div><input class="inp" data-fix="ten" data-id="'+l.id+'" value="'+esc(l.ten||"")+'"></div>'
    +'</div>'
    +'<div style="margin-top:12px"><div class="lb">Nguồn quảng cáo <i>khách này gọi từ đâu</i></div><div class="chips">'
-     +HOTLINES.map(function(h){return '<button class="chip" data-src="'+h.id+'" data-id="'+l.id+'" aria-pressed="'+(l.hotline===h.id)+'">'
+     +hlDung().map(function(h){return '<button class="chip" data-src="'+h.id+'" data-id="'+l.id+'" aria-pressed="'+(l.hotline===h.id)+'">'
        +'<span class="dot" style="background:'+h.mau+'"></span>'+esc(h.kenh)+'</button>'}).join('')
      +'</div>'
    +'</div>'

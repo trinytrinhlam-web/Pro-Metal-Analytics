@@ -107,7 +107,8 @@ chối, gợi ý tự động, bảng chi tiết).
   file ghi âm ngay — xem `GHI-AM-AI.md`
 - **Nút dán số vừa copy** và **nhận số chia sẻ từ app Điện thoại** (Android) —
   hai cách miễn phí bỏ luôn việc gõ số điện thoại, xem `NHAP-NHANH.md`
-- **Tab Cài đặt**: admin thêm thợ, đặt mã PIN, cho thợ nghỉ
+- **Tab Cài đặt**: admin thêm thợ, đặt mã PIN, cho thợ nghỉ; sửa hotline từng
+  kênh (đổi số, đổi tên kênh, chi phí tháng, màu biểu đồ, cho nghỉ, thêm mới)
 
 **Chạy thử 1–2 tuần với khách thật trước khi làm tiếp.** Dữ liệu thật sẽ cho
 thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ liệu là làm mò.

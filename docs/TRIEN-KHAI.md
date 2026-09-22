@@ -27,6 +27,11 @@ mềm khớp theo số điện thoại rồi tự điền, không ai phải bấ
 > Nguyên tắc duy nhất phải giữ: **một số chỉ đăng đúng một chỗ.** In nhầm số
 > Google Ads lên biển hiệu là hỏng toàn bộ số liệu của kênh đó.
 
+**Đổi số giữa chừng thì sao?** Vào Cài đặt → Hotline theo kênh, sửa thẳng số của
+kênh đó. Đơn cũ không bị ảnh hưởng vì đơn gắn với kênh chứ không gắn với dãy số.
+Nếu số mới dùng cho một kênh khác thì bấm **Thêm hotline** thay vì sửa, và cho số
+cũ **nghỉ** để nó biến khỏi chỗ gán nguồn mà vẫn giữ được số liệu cũ.
+
 ## 2. Đưa app lên mạng
 
 ```bash

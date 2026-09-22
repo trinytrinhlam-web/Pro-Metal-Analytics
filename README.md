@@ -34,7 +34,7 @@ vào form (bản demo dùng câu mẫu, bản thật gọi Gemini).
 Bên Admin có bốn tab: **Duyệt đơn** (nhập báo cáo cuộc gọi Google Ads, kiểm dữ
 liệu thợ nhập, gán nguồn quảng cáo),
 **Khách cũ & bảo hành** (tra cứu theo số điện thoại, hạn bảo hành, danh sách sắp
-hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (thêm thợ, đặt mã PIN).
+hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (thêm thợ, đặt mã PIN, sửa hotline từng kênh).
 
 Đăng nhập thợ trong demo: mã **1234**.
 
