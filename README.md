@@ -10,8 +10,8 @@ Mục tiêu không chỉ là lưu tên khách, mà là **trả lời được c�
 
 | Phần | Ai dùng | Thiết bị | Đường dẫn dự kiến |
 |---|---|---|---|
-| Nhập khách (có giọng nói) | Thợ / sale | Điện thoại (chỉ tối ưu mobile) | `suachuacuasat.com/nhap` |
-| Duyệt đơn + bảo hành + phân tích | Admin (chủ) | Máy tính + điện thoại | `suachuacuasat.com/admin` |
+| Nhập khách (có giọng nói) | Thợ / sale | Điện thoại (chỉ tối ưu mobile) | `app.suachuacuasat.com` |
+| Duyệt đơn + bảo hành + phân tích + cài đặt | Admin (chủ) | Máy tính + điện thoại | `app.suachuacuasat.com/admin` |
 
 Có thể tạo thêm đường dẫn khác tuỳ ý, ví dụ `/guikhachcusat`.
 
@@ -31,9 +31,11 @@ khách ở màn hình thợ rồi bấm sang tab Admin sẽ thấy số liệu �
 Màn hình thợ có nút **🎤 Nói cho nhanh** ở đầu trang: bấm, đọc một hơi, máy điền
 vào form (bản demo dùng câu mẫu, bản thật gọi Gemini).
 
-Bên Admin có ba tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo),
+Bên Admin có bốn tab: **Duyệt đơn** (kiểm dữ liệu thợ nhập, gán nguồn quảng cáo),
 **Khách cũ & bảo hành** (tra cứu theo số điện thoại, hạn bảo hành, danh sách sắp
-hết hạn) và **Phân tích** (biểu đồ, chỉ số).
+hết hạn), **Phân tích** (biểu đồ, chỉ số) và **Cài đặt** (thêm thợ, đặt mã PIN).
+
+Đăng nhập thợ trong demo: mã **1234**.
 
 - `demo/app.html` — bản gốc, sửa ở đây
 - `demo/index.html` — bản chạy độc lập, sinh ra bằng `bash demo/build.sh`
@@ -45,6 +47,7 @@ hết hạn) và **Phân tích** (biểu đồ, chỉ số).
 | [docs/KE-HOACH.md](docs/KE-HOACH.md) | Kế hoạch làm, chia giai đoạn, phạm vi từng giai đoạn |
 | [docs/CAU-TRUC-DU-LIEU.md](docs/CAU-TRUC-DU-LIEU.md) | Các bảng dữ liệu, SQL tạo bảng, phân quyền |
 | [docs/CHI-SO-PHAN-TICH.md](docs/CHI-SO-PHAN-TICH.md) | Từng chỉ số nghĩa là gì và dùng để chỉnh quảng cáo ra sao |
+| [docs/NHAP-NHANH.md](docs/NHAP-NHANH.md) | Các cách để thợ nhập nhanh hơn hoặc không phải nhập, và chuyện domain |
 | [docs/BAO-HANH.md](docs/BAO-HANH.md) | Tra cứu bảo hành, hạn từng hạng mục, danh sách gọi chăm sóc |
 | [docs/GHI-AM-AI.md](docs/GHI-AM-AI.md) | Nhập bằng giọng nói qua Gemini, và cách xoá sạch file ghi âm |
 | [docs/TRIEN-KHAI.md](docs/TRIEN-KHAI.md) | Trỏ domain, cài hotline, đưa app lên mạng |

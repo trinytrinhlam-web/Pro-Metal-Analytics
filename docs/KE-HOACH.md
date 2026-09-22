@@ -7,6 +7,10 @@
 | Nền tảng | Next.js + Supabase, deploy trên Vercel |
 | Thợ đăng nhập | Mã PIN 4–6 số, mỗi thợ một mã |
 | Quy mô | 1–5 thợ, dưới 300 đơn/tháng |
+| Thợ | Khởi tạo một thợ demo; admin tự thêm thợ và đặt mã PIN trong tab Cài đặt. Không lưu số điện thoại thợ |
+| Khu vực | Đủ 168 phường/xã TP.HCM, ô chọn có tìm kiếm (TP.HCM đã bỏ cấp quận/huyện từ 01/07/2025) |
+| Dịch vụ | 10 hạng mục lấy từ suachuacuasat.com |
+| Domain | `app.suachuacuasat.com` — WordPress hiện tại giữ nguyên |
 | Trường thêm | Trạng thái đơn + lý do từ chối, Khu vực (quận), Loại công trình |
 | **Nguồn khách** | **Thợ không nhập.** Admin gán nguồn ở màn "Duyệt đơn" (xem mục 1.1) |
 | Doanh thu | Để trống được, điền sau khi làm xong việc |
@@ -101,6 +105,9 @@ chối, gợi ý tự động, bảng chi tiết).
 - Nhận diện khách cũ theo số điện thoại
 - **Nhập bằng giọng nói**: thợ đọc, Gemini điền vào form, thợ kiểm rồi lưu, xoá
   file ghi âm ngay — xem `GHI-AM-AI.md`
+- **Nút dán số vừa copy** và **nhận số chia sẻ từ app Điện thoại** (Android) —
+  hai cách miễn phí bỏ luôn việc gõ số điện thoại, xem `NHAP-NHANH.md`
+- **Tab Cài đặt**: admin thêm thợ, đặt mã PIN, cho thợ nghỉ
 
 **Chạy thử 1–2 tuần với khách thật trước khi làm tiếp.** Dữ liệu thật sẽ cho
 thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ liệu là làm mò.
@@ -149,8 +156,8 @@ thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ
 ## 5. Việc bạn cần làm
 
 1. Xem demo, nói chỗ nào cần sửa
-2. Chốt danh sách dịch vụ đúng với nghề của bạn (demo đang để 7 loại)
-3. Chốt danh sách quận/huyện bạn nhận việc
-4. Chuẩn bị số hotline cho từng kênh
-5. Cho biết ngân sách quảng cáo hiện tại từng kênh/tháng
-6. Cho biết tên và số thợ sẽ dùng
+1. Xem lại danh sách dịch vụ tôi lấy từ suachuacuasat.com xem đã đúng chưa
+2. Chuẩn bị số hotline cho từng kênh (xem `TRIEN-KHAI.md`)
+3. Thêm DNS `app.suachuacuasat.com` trỏ về Vercel
+4. Mỗi tháng nhập chi phí quảng cáo từng kênh — ngân sách không cố định cũng không sao,
+   nhập đúng số đã tiêu tháng đó là được

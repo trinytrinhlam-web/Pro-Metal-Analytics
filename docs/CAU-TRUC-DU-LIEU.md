@@ -21,13 +21,15 @@ chi_phi_quang_cao (ngân sách từng kênh theo tháng) ── ghép với hotl
 create table tho (
   id          uuid primary key default gen_random_uuid(),
   ten         text not null,
-  viet_tat    text not null,                 -- 2 ký tự hiện trên avatar
   pin         text not null,                 -- lưu dạng đã băm, không lưu số trần
-  so_dien_thoai text,
   vai_tro     text not null default 'tho' check (vai_tro in ('tho','admin')),
   dang_dung   boolean not null default true,
   tao_luc     timestamptz not null default now()
 );
+
+-- Không lưu số điện thoại hay email của thợ: không cần tới, và càng ít dữ liệu
+-- cá nhân càng đỡ phải lo giữ. Chữ viết tắt trên avatar suy từ tên, không lưu.
+-- Hệ thống khởi tạo với đúng một thợ demo; admin tự thêm thợ thật trong Cài đặt.
 
 -- Mỗi kênh quảng cáo một số hotline
 create table hotline (
@@ -143,7 +145,27 @@ lúc tạo đơn, nên tra cứu về sau chỉ việc đọc chứ không phả
 Ba danh sách này nằm trong cấu hình, sửa được bất cứ lúc nào mà không phải đụng
 vào code. Bản demo đang để tạm:
 
-- **Dịch vụ**: Cửa cổng · Cửa cuốn · Lan can – ban công · Cầu thang · Khung bảo vệ · Mái tôn · Sơn – hàn vá
-- **Khu vực**: Gò Vấp · Tân Bình · Bình Thạnh · Quận 12 · Thủ Đức · Quận 7 · Tân Phú · Bình Tân · Quận 10 · Hóc Môn
+- **Dịch vụ** (lấy từ suachuacuasat.com): Sửa cửa sắt · Sửa cửa kéo · Cửa cuốn ·
+  Làm cửa – cổng sắt · Cầu thang – lan can sắt · Inox (cửa, cầu thang, lan can) ·
+  Mái hiên – mái che · Nhôm kính · Vách ngăn panel · Hàn sắt tại nhà
+- **Phường / xã**: đủ **168 đơn vị của TP.HCM** (113 phường + 54 xã + đặc khu Côn Đảo),
+  hiệu lực 01/07/2025. **Cấp quận/huyện đã bị bỏ** — xem mục dưới.
 - **Loại công trình**: Nhà phố · Chung cư · Xưởng – kho · Shop – văn phòng
 - **Lý do từ chối**: Giá cao · Ở quá xa · Đã thuê thợ khác · Không liên lạc lại được · Chỉ hỏi tham khảo
+
+### Về khu vực: TP.HCM không còn quận/huyện
+
+Từ 01/07/2025 TP.HCM sáp nhập với Bình Dương và Bà Rịa – Vũng Tàu, bỏ cấp
+quận/huyện, còn **168 phường/xã/đặc khu** trực thuộc thẳng thành phố.
+
+Vì vậy ô khu vực không còn là danh sách 10 quận nữa. 168 mục thì không thể nhét
+vào một dropdown trên điện thoại, nên màn hình thợ dùng **ô chọn có tìm kiếm**:
+
+- Gõ không dấu vẫn ra: `go vap` → Gò Vấp
+- **Mọi tên quận cũ đều còn tồn tại dưới dạng tên phường mới** (Gò Vấp, Bình Tân,
+  Tân Phú, Bình Thạnh, Thủ Đức, Hóc Môn, Bình Chánh, Tân Bình, Củ Chi, Nhà Bè…),
+  nên thợ gõ theo thói quen cũ vẫn tìm ra
+- Gõ `quan 7` thì báo rõ là đã bỏ cấp quận, chứ không để màn hình trống
+- Nhóm **Hay làm nhất** đặt sẵn 8 khu vực xưởng nhận việc nhiều, nằm trên đầu
+
+Danh sách này cần cập nhật lại nếu nhà nước sắp xếp hành chính tiếp.

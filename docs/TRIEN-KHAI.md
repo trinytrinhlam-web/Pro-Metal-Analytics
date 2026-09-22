@@ -44,7 +44,9 @@ git push origin main
 
 ## 3. Trỏ domain
 
-Có hai cách, chọn theo tình trạng hiện tại của suachuacuasat.com:
+suachuacuasat.com đang chạy **WordPress**. Đã chốt: dùng subdomain, không đụng
+vào web hiện tại. Nếu sau này vẫn muốn đường dẫn `/guikhachcusat` thì xem
+`NHAP-NHANH.md` phần cuối — làm được, miễn phí, nhưng để sau.
 
 **Cách A — subdomain (khuyên dùng, không đụng gì tới web hiện tại):**
 
