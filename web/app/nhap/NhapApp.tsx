@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ManPin from "./ManPin";
 import ChonKhuVuc from "./ChonKhuVuc";
 import { guiLai, soDonCho, taoKhoa, themVaoHangDoi } from "./hangDoi";
+import { coGiDangKe, docBanNhap, luuBanNhap, xoaBanNhap } from "./banNhap";
 import { choInputNgayGio, ddmm, hhmm, ngan, tat } from "./tienIch";
 import { DICH_VU, LOAI_CONG_TRINH, LY_DO_TU_CHOI, chuanSdt, dinhDangSdt } from "@/lib/danh-muc";
 import type { GioiTinh, KhachHang, TrangThai } from "@/lib/kieu";
@@ -49,6 +50,7 @@ export default function NhapApp({
   const [online, setOnline] = useState(true);
   const [cho, setCho] = useState(0);
   const [voice, setVoice] = useState<TrangThaiVoice>("cho");
+  const [daKhoiPhuc, setDaKhoiPhuc] = useState(false);
   const [giay, setGiay] = useState(0);
   const [loiDoc, setLoiDoc] = useState("");
   const mrRef = useRef<MediaRecorder | null>(null);
@@ -92,6 +94,27 @@ export default function NhapApp({
       window.removeEventListener("online", dongBo);
     };
   }, [tho, bao, napHomNay]);
+
+  /* ── mở lại app thì lấy lại đơn đang gõ dở ────────────────────────── */
+  useEffect(() => {
+    const b = docBanNhap();
+    if (b && coGiDangKe(b)) {
+      setF((p) => ({
+        ...p,
+        ...(b as unknown as Partial<Form>),
+        thoiDiem: new Date(b.thoiDiem),
+        ai: {},
+      }));
+      setDaKhoiPhuc(true);
+    }
+  }, []);
+
+  /* Gõ tới đâu giữ tới đó, phòng khi điện thoại dọn app nền. */
+  useEffect(() => {
+    if (suaId) return;                 // đang sửa đơn cũ thì không đụng vào bản nháp
+    const t = setTimeout(() => luuBanNhap(f), 400);
+    return () => clearTimeout(t);
+  }, [f, suaId]);
 
   /* ── nhận số chia sẻ từ app Điện thoại (Android) ──────────────────── */
   useEffect(() => {
@@ -248,6 +271,8 @@ export default function NhapApp({
     }
   }
   function xongMotDon() {
+    xoaBanNhap();
+    setDaKhoiPhuc(false);
     setF(formRong());
     setSuaId(null);
     setKhachCu(null);
@@ -321,6 +346,20 @@ export default function NhapApp({
               dung={dungGhi}
               lamLai={() => { setVoice("cho"); setLoiDoc(""); xongMotDon(); }}
             />
+          )}
+
+          {daKhoiPhuc && !suaId && (
+            <div className="hint" style={{ borderLeftColor: "var(--good)", marginBottom: 14 }}>
+              <b>Đã lấy lại đơn bạn đang gõ dở.</b> Nhập nốt rồi bấm Lưu, hoặc{" "}
+              <button
+                type="button"
+                style={{ border: 0, background: "none", textDecoration: "underline", padding: 0, fontWeight: 700, color: "var(--accent)" }}
+                onClick={xongMotDon}
+              >
+                bỏ đi nhập khách mới
+              </button>
+              .
+            </div>
           )}
 
           <div className="fld">

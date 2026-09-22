@@ -96,6 +96,36 @@ bản mới, không phải cài lại.
 Mỗi thợ trong danh sách còn có nút **Lời nhắn Zalo**: copy sẵn một đoạn có link,
 mã PIN và hướng dẫn, dán thẳng vào Zalo gửi cho thợ.
 
+### Bấm biểu tượng thì mở tab mới hay về chỗ cũ
+
+**Về đúng chỗ cũ, không đẻ thêm cửa sổ.** App cài lên màn hình chính chạy ở cửa
+sổ riêng, không phải tab trình duyệt; manifest khai `launch_handler:
+navigate-existing` nên bấm biểu tượng hay bấm link đều quay về cửa sổ đang mở.
+
+Có ba trường hợp mất phiên, nói trước cho rõ:
+
+| Tình huống | Chuyện gì xảy ra |
+|---|---|
+| Thợ bấm biểu tượng, app còn trong bộ nhớ | Về đúng màn đang dở, còn nguyên những gì vừa gõ |
+| Điện thoại đã dọn app nền để lấy bộ nhớ | App mở lại từ đầu, **nhưng đơn đang gõ dở được lấy lại** (xem dưới) |
+| Thợ bấm link **trong Zalo** | ⚠️ Zalo mở bằng trình duyệt riêng của nó — phiên đăng nhập khác, phải nhập mã lại, và không cài lên màn hình chính được |
+
+Vì trường hợp thứ ba mà **quét QR bằng camera vẫn là cách đúng**: camera mở bằng
+Chrome/Safari thật. Nếu lỡ bấm link trong Zalo thì bấm dấu **…** ở góc chọn
+**Mở bằng trình duyệt** rồi hãy cài. Lời nhắn Zalo mà app copy sẵn đã có câu nhắc này.
+
+iPhone dọn app nền hăng hơn Android, nên thợ dùng iPhone sẽ gặp cảnh mở lại từ
+đầu nhiều hơn. Đăng nhập thì không mất (cookie giữ 60 ngày), chỉ là màn hình về
+lại trang nhập.
+
+### Đơn gõ dở không bị mất
+
+Thợ gõ tới đâu máy giữ tới đó. Điện thoại dọn app, thợ lỡ tay thoát, hay sóng rớt
+— mở lại vẫn còn nguyên số điện thoại, tên, dịch vụ đã chọn, kèm dòng báo
+*"Đã lấy lại đơn bạn đang gõ dở"* và nút bỏ đi nếu không cần.
+
+Bản nháp tự xoá sau khi lưu đơn, hoặc sau 12 tiếng không đụng tới.
+
 ### Đặt địa chỉ cho ngắn
 
 Địa chỉ gốc đã tự chuyển vào màn nhập, nên thợ không phải nhớ đường dẫn phía sau
@@ -121,6 +151,8 @@ cho thợ nghe qua điện thoại là được.
 | Chia sẻ số | Android: chia sẻ số từ app Điện thoại thẳng vào app này |
 | Khách cũ | Gõ đủ số là hiện lịch sử: mấy lần, làm gì, tổng bao nhiêu |
 | Mất sóng | Đơn nằm trên máy, có sóng tự gửi. Gửi lại nhiều lần cũng chỉ ra một đơn |
+| Gõ dở | Giữ lại bản nháp, mở lại app là còn nguyên |
+| Phát app | Mã QR trong màn Cài đặt, thợ quét là vào, không gõ chữ nào |
 | Gần đây | Xem và sửa đơn 7 ngày qua, bổ sung tiền công |
 | Bảo hành | Hạn 24 tháng ghi sẵn vào từng hạng mục ngay lúc tạo đơn |
 | Cài đặt | Thêm thợ, đổi mã PIN, sửa hotline từng kênh |

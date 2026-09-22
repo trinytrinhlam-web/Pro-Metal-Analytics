@@ -23,10 +23,15 @@ export default function CaiDat({ ten }: { ten: string }) {
   useEffect(() => setDiaChi(window.location.origin), []);
 
   async function copyLoiNhan(tenTho: string, pin: string) {
+    // Nhắc mở bằng Chrome/Safari: trình duyệt trong Zalo là một cái riêng, cài
+    // lên màn hình chính từ đó không được và lần sau phải đăng nhập lại.
     const chu =
-      `Anh/chị ${tenTho} mở link này trên điện thoại:\n${diaChi}\n\n` +
-      `Mã đăng nhập: ${pin}\n\n` +
-      `Mở xong bấm menu trình duyệt chọn "Thêm vào màn hình chính" để lần sau khỏi gõ link.`;
+      `Anh/chị ${tenTho} làm giúp em 3 bước này, chỉ 1 lần thôi:\n\n` +
+      `1. Mở link: ${diaChi}\n` +
+      `   (Nếu bấm link ngay trong Zalo thì bấm dấu ... ở góc rồi chọn "Mở bằng trình duyệt")\n` +
+      `2. Bấm menu trình duyệt → "Thêm vào màn hình chính"\n` +
+      `3. Nhập mã: ${pin}\n\n` +
+      `Xong rồi lần sau chỉ bấm biểu tượng ngoài màn hình, khỏi gõ link khỏi nhập mã lại.`;
     try {
       await navigator.clipboard.writeText(chu);
       setDaCopy(tenTho);
@@ -100,6 +105,11 @@ export default function CaiDat({ ten }: { ten: string }) {
             <div className="hint" style={{ marginTop: 12 }}>
               Từ lần sau thợ chỉ bấm biểu tượng trên màn hình chính như mọi app khác.
               Không gõ link, không đăng nhập lại.
+            </div>
+            <div className="hint" style={{ borderLeftColor: "var(--warn)", marginTop: 8 }}>
+              <b>Quét QR bằng camera, đừng bấm link trong Zalo.</b> Zalo mở link bằng trình duyệt
+              riêng của nó — không cài lên màn hình chính được, mà lần sau còn bắt đăng nhập lại.
+              Nếu lỡ bấm trong Zalo thì bấm dấu <b>…</b> ở góc chọn <b>Mở bằng trình duyệt</b>.
             </div>
           </div>
         </div>
