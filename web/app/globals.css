@@ -41,9 +41,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .who span{font-size:11.5px;color:var(--ink3)}
 .pill{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px 9px;
   font-size:11px;font-weight:600;white-space:nowrap;flex:none}
-.scroll{flex:1;padding:14px 14px 110px}
-.tabs{display:flex;border-top:1px solid var(--line);background:var(--panel);
-  position:sticky;bottom:0;z-index:8}
+.scroll{flex:1;padding:14px 14px 18px}
+/* Nút Lưu và thanh tab xếp chồng trong một cái đáy chung, dính đáy màn hình.
+   Trước đây nút Lưu để position:fixed nên nó đè mất thanh tab. */
+.chan{position:sticky;bottom:0;z-index:9;background:var(--bg)}
+.tabs{display:flex;border-top:1px solid var(--line);background:var(--panel)}
 .tabs button{flex:1;min-width:0;border:0;background:none;
   padding:9px 4px calc(9px + env(safe-area-inset-bottom,0px));
   font-size:11.5px;font-weight:600;color:var(--ink3);display:grid;gap:3px;justify-items:center}
@@ -76,14 +78,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .quick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .quick button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;
   padding:7px 11px;font-size:12.5px;font-weight:700}
-.save{position:fixed;left:0;right:0;bottom:0;z-index:9;padding:11px 14px calc(11px + env(safe-area-inset-bottom,0px));
-  background:linear-gradient(to top,var(--bg) 62%,transparent);
-  max-width:520px;margin:0 auto}
+.save{padding:10px 14px 12px;background:var(--bg)}
 .save button{width:100%;border:0;border-radius:14px;background:var(--accent);color:var(--accent-on);
   padding:16px;font-size:16.5px;font-weight:800;font-family:Archivo,sans-serif;letter-spacing:.02em;
   box-shadow:var(--shadow)}
 .save button[disabled]{opacity:.6}
-.toast{position:fixed;left:14px;right:14px;bottom:92px;max-width:492px;margin:0 auto;z-index:20;
+/* Nằm ngay trên cái đáy, không phải đo tay xem đáy cao bao nhiêu. */
+.toast{position:absolute;left:14px;right:14px;bottom:100%;margin-bottom:10px;z-index:20;
   background:var(--good);color:#fff;border-radius:12px;padding:12px 14px;font-weight:700;font-size:14px;
   box-shadow:var(--shadow)}
 .toast.xau{background:var(--crit)}

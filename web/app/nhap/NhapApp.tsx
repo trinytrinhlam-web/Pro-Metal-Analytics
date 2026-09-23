@@ -600,22 +600,26 @@ export default function NhapApp({
         </div>
       )}
 
-      {man === "nhap" && (
-        <div className="save">
-          <button onClick={luu} disabled={dangLuu}>
-            {dangLuu ? "ĐANG LƯU…" : suaId ? "CẬP NHẬT ĐƠN" : "LƯU KHÁCH"}
-          </button>
-        </div>
-      )}
+      <footer className="chan">
+        {toast && <div className={`toast${toast.xau ? " xau" : ""}`}>{toast.chu}</div>}
 
-      <nav className="tabs">
-        <button aria-selected={man === "nhap"} onClick={() => setMan("nhap")}>
-          <span style={{ fontSize: 17 }}>✎</span>Nhập khách
-        </button>
-        <button aria-selected={man === "hom-nay"} onClick={() => { setMan("hom-nay"); napHomNay(); }}>
-          <span style={{ fontSize: 17 }}>☰</span>Gần đây ({dsHomNay.length})
-        </button>
-      </nav>
+        {man === "nhap" && (
+          <div className="save">
+            <button onClick={luu} disabled={dangLuu}>
+              {dangLuu ? "ĐANG LƯU…" : suaId ? "CẬP NHẬT ĐƠN" : "LƯU KHÁCH"}
+            </button>
+          </div>
+        )}
+
+        <nav className="tabs">
+          <button aria-selected={man === "nhap"} onClick={() => setMan("nhap")}>
+            <span style={{ fontSize: 17 }}>✎</span>Nhập khách
+          </button>
+          <button aria-selected={man === "hom-nay"} onClick={() => { setMan("hom-nay"); napHomNay(); }}>
+            <span style={{ fontSize: 17 }}>☰</span>Gần đây ({dsHomNay.length})
+          </button>
+        </nav>
+      </footer>
 
       {moKV && (
         <ChonKhuVuc
@@ -624,7 +628,6 @@ export default function NhapApp({
           dong={() => setMoKV(false)}
         />
       )}
-      {toast && <div className={`toast${toast.xau ? " xau" : ""}`}>{toast.chu}</div>}
     </div>
   );
 }
