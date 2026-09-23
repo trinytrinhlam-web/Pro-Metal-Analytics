@@ -8,9 +8,21 @@ import type { Database } from "./database.types";
  */
 let _db: ReturnType<typeof createClient<Database>> | null = null;
 
+/**
+ * Trang Data API của Supabase hiện URL kèm đuôi `/rest/v1/`, rất dễ copy cả
+ * đuôi. Thư viện tự thêm đuôi đó vào nên để nguyên là thành `/rest/v1/rest/v1/`
+ * rồi hỏng — cắt sẵn cho khỏi phải đi dò.
+ */
+export function donUrl(x: string | undefined): string {
+  return String(x || "")
+    .trim()
+    .replace(/\/+$/, "")
+    .replace(/\/(rest|auth|storage|realtime)\/v1$/i, "");
+}
+
 export function db() {
   if (_db) return _db;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = donUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     throw new Error(

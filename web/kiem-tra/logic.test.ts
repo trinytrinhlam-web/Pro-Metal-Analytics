@@ -9,6 +9,7 @@ import { boDau, chuanSdt, dinhDangSdt, KHU_VUC, KHU_VUC_HAY } from "../lib/danh-
 import { bamPin, kiemPin } from "../lib/mat-khau.ts";
 import { docToken, taoToken } from "../lib/token.ts";
 import { hanBaoHanh } from "../lib/ngay.ts";
+import { donUrl } from "../lib/db.ts";
 
 process.env.SESSION_SECRET ||= "bi-mat-de-kiem-thu";
 
@@ -85,4 +86,15 @@ test("hạn bảo hành 24 tháng tính đúng, kể cả cuối tháng", () => 
   assert.equal(ng(hanBaoHanh(new Date(2026, 0, 31), 1)), "2026-02-28");   // không có 31/02
   assert.equal(ng(hanBaoHanh(new Date(2024, 0, 31), 1)), "2024-02-29");   // năm nhuận
   assert.equal(ng(hanBaoHanh(new Date(2026, 11, 15), 24)), "2028-12-15"); // qua hai lần đổi năm
+});
+
+test("URL Supabase copy dính đuôi /rest/v1 vẫn dùng được", () => {
+  const dung = "https://dsjfsbiyxatrxkgolyqw.supabase.co";
+  assert.equal(donUrl(dung), dung);
+  assert.equal(donUrl(dung + "/"), dung);
+  assert.equal(donUrl(dung + "/rest/v1/"), dung);        // đúng cái trang Data API hiện ra
+  assert.equal(donUrl(dung + "/rest/v1"), dung);
+  assert.equal(donUrl(dung + "/auth/v1/"), dung);
+  assert.equal(donUrl("  " + dung + "  "), dung);
+  assert.equal(donUrl(undefined), "");
 });
