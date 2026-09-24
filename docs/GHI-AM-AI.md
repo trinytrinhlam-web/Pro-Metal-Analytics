@@ -124,3 +124,26 @@ sai chỗ nào để chỉnh lại cách đọc.
 
 Thợ sửa hoặc xoá đoạn chữ đó được, vì nó nằm ngay trong ô Ghi chú bình thường. Ô
 này có nhãn *“lời bạn vừa đọc, sửa hoặc xoá được”* để thợ khỏi tưởng là chữ lạ.
+
+
+## Cắm khoá vào (làm một lần)
+
+1. [aistudio.google.com](https://aistudio.google.com) → **Get API key**
+2. Vercel → **Settings → Environment Variables** → tên biến `GEMINI_API_KEY`,
+   khoá dán vào ô **Value**
+3. **Redeploy**
+4. `/admin` → **Cài đặt** → **Kiểm tra khoá Gemini**
+
+Nút kiểm tra hỏi thẳng Google xem model có dùng được không — nhẹ, không tốn
+token, và phân biệt được ba thứ mà trước đây ra cùng một câu báo lỗi: khoá sai,
+tên model sai, và hết hạn mức.
+
+Chưa cắm khoá thì thanh ghi âm tự ẩn khỏi màn thợ.
+
+## Tên model đổi thì làm sao
+
+Google khai tử model cũ khá nhanh, và tên cũ là **chết hẳn** chứ không chạy tạm.
+Mặc định hiện tại là `gemini-3.8-flash`.
+
+Đổi bằng biến `GEMINI_MODEL` trên Vercel rồi Redeploy — **không phải sửa code**.
+Nút kiểm tra sẽ báo `Không có model tên "..."` khi gặp trường hợp này.

@@ -66,7 +66,8 @@ export async function POST(req: Request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) {
     return NextResponse.json(
-      { loi: "Chưa cấu hình GEMINI_API_KEY nên phần đọc bằng giọng nói chưa chạy được." },
+      // Thợ không cần biết tên biến môi trường là gì.
+      { loi: "Phần đọc bằng giọng nói chưa bật. Nhập tay giúp nhé." },
       { status: 503 }
     );
   }
@@ -78,7 +79,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ loi: "Đoạn ghi âm dài quá, đọc ngắn lại giúp." }, { status: 413 });
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+  // Google đổi tên model xoành xoạch và tên cũ là chết hẳn chứ không chạy tạm.
+  // Đổi được bằng biến môi trường GEMINI_MODEL, khỏi phải sửa code deploy lại.
+  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const ver = process.env.GEMINI_API_VERSION || "v1beta";
   const url = `https://generativelanguage.googleapis.com/${ver}/models/${model}:generateContent`;
 
@@ -109,8 +112,16 @@ export async function POST(req: Request) {
   if (!res.ok) {
     const chiTiet = await res.text().catch(() => "");
     console.error("Gemini lỗi", res.status, chiTiet.slice(0, 400));
+    // 400/403/404 là sai khoá hoặc sai tên model — tức là cấu hình sai, chứ
+    // không phải mạng chập chờn. Thợ bấm lại mười lần cũng vậy thôi, nên nói
+    // khác đi để còn biết đường báo chủ tiệm.
+    const saiCauHinh = res.status === 400 || res.status === 403 || res.status === 404;
     return NextResponse.json(
-      { loi: "Máy không nghe được lúc này, bạn nhập tay giúp." },
+      {
+        loi: saiCauHinh
+          ? "Phần đọc bằng giọng nói chưa cài đúng. Báo chủ tiệm kiểm tra lại, tạm thời nhập tay giúp."
+          : "Máy không nghe được lúc này, bạn nhập tay giúp.",
+      },
       { status: 502 }
     );
   }

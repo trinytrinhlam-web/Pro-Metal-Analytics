@@ -51,7 +51,8 @@ Trước khi bấm Deploy, mở **Environment Variables** và thêm bốn dòng:
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → **Project URL** |
 | `SUPABASE_SERVICE_ROLE_KEY` | cùng trang, mục **service_role** — khoá bí mật, đừng đưa cho ai |
 | `SESSION_SECRET` | gõ đại một chuỗi dài ngẫu nhiên 40–60 ký tự, chữ và số lẫn lộn |
-| `GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com) → Get API key. Bỏ trống cũng được, khi đó nút ghi âm tự ẩn |
+| `GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com) → Get API key. Bỏ trống cũng được, khi đó thanh ghi âm của thợ tự ẩn |
+| `GEMINI_MODEL` | *(không bắt buộc)* mặc định `gemini-3.8-flash`. Google đổi tên model thì sửa ở đây, không phải sửa code |
 
 Bấm **Deploy**, chờ 1–2 phút.
 
@@ -208,6 +209,21 @@ Vào `/admin` bằng mã PIN admin. Bốn tab:
 | **Cài đặt** | Thêm thợ, đặt PIN, mã QR phát app; sửa hotline từng kênh và chi phí tháng |
 
 Bộ lọc ở màn Phân tích: khoảng thời gian, nguồn, thợ, dịch vụ, phường xã.
+
+### Bật nhập bằng giọng nói
+
+Thợ bấm micro rồi đọc &quot;chị Lan không chín ba mốt..., sửa cửa kéo ở Gò Vấp, bốn
+triệu tám&quot; — Gemini nghe rồi điền sẵn vào form, thợ soát lại rồi lưu. File ghi
+âm **không lưu ở đâu cả**: đi thẳng từ máy thợ qua máy chủ tới Google rồi bỏ.
+
+1. Lấy khoá ở [aistudio.google.com](https://aistudio.google.com) → **Get API key**
+2. Vercel → **Settings → Environment Variables** → thêm biến tên `GEMINI_API_KEY`,
+   dán khoá vào ô **Value** (ô **Key** là *tên biến*, không phải chỗ dán khoá)
+3. **Redeploy** — biến môi trường mới chỉ có hiệu lực sau khi deploy lại
+4. Vào `/admin` → **Cài đặt** → bấm **Kiểm tra khoá Gemini**. Nó nói thẳng chạy
+   được hay hỏng ở đâu, khỏi phải bảo thợ ghi âm thử
+
+Chưa cắm khoá thì thanh ghi âm tự ẩn, thợ vẫn nhập tay bình thường.
 
 > Tiền quảng cáo chỉ ghi được theo **kênh**, không chẻ nhỏ theo thợ / dịch vụ /
 > phường xã. Nên khi lọc mấy mục đó, giá 1 khách và ROAS chỉ để tham khảo — màn

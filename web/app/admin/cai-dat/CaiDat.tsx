@@ -17,6 +17,8 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
   const [kenhMoi, setKenhMoi] = useState("");
   const [diaChi, setDiaChi] = useState("");
   const [daCopy, setDaCopy] = useState("");
+  const [ai, setAi] = useState<{ xong: boolean; chu: string; chiTiet: string; model: string } | null>(null);
+  const [dangThu, setDangThu] = useState(false);
 
   // Địa chỉ app lấy từ chính trình duyệt, khỏi phải cấu hình thêm biến nào.
   useEffect(() => setDiaChi(window.location.origin), []);
@@ -236,6 +238,47 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
           </button>
         </div>
 
+      </div>
+
+      <div className="panel">
+        <h2>Nhập bằng giọng nói</h2>
+        <p className="sub">
+          Thợ bấm nút micro rồi đọc &quot;chị Lan không tám tám..., sửa cửa kéo ở Gò Vấp, bốn
+          triệu tám&quot; — máy nghe rồi điền sẵn vào form, thợ chỉ việc soát lại rồi lưu.
+          Cần khoá Gemini cắm vào Vercel. File ghi âm không lưu ở đâu cả.
+        </p>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
+          <button
+            className="ghost"
+            disabled={dangThu}
+            onClick={async () => {
+              setDangThu(true);
+              try {
+                const r = await fetch("/api/admin/kiem-tra-ai");
+                setAi(await r.json());
+              } catch {
+                setAi({ xong: false, chu: "Không kiểm tra được.", chiTiet: "Thử lại sau ít phút.", model: "" });
+              } finally {
+                setDangThu(false);
+              }
+            }}
+          >
+            {dangThu ? "Đang thử…" : "Kiểm tra khoá Gemini"}
+          </button>
+          {ai && (
+            <span style={{ fontWeight: 700, color: ai.xong ? "var(--good)" : "var(--crit)" }}>
+              {ai.xong ? "✓" : "✕"} {ai.chu}
+            </span>
+          )}
+        </div>
+        {ai && (
+          <div
+            className="hint"
+            style={{ marginTop: 10, borderLeftColor: ai.xong ? "var(--good)" : "var(--crit)" }}
+          >
+            {ai.chiTiet}
+          </div>
+        )}
       </div>
     </>
   );

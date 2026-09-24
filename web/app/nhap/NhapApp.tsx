@@ -35,8 +35,11 @@ type TrangThaiVoice = "tat" | "cho" | "ghi" | "gui" | "xong";
 
 export default function NhapApp({
   thoBanDau,
+  coAI,
 }: {
   thoBanDau: { ten: string; vaiTro: string } | null;
+  /** Chưa cắm khoá Gemini thì giấu luôn thanh ghi âm, đừng để thợ đọc xong mới báo hỏng. */
+  coAI: boolean;
 }) {
   const [tho, setTho] = useState(thoBanDau);
   const [man, setMan] = useState<"nhap" | "hom-nay">("nhap");
@@ -336,7 +339,7 @@ export default function NhapApp({
 
       {man === "nhap" ? (
         <div className="scroll">
-          {!suaId && (
+          {!suaId && coAI && (
             <VoiceBar
               trangThai={voice}
               giay={giay}
