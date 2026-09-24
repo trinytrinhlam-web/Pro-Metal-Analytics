@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { BAO_HANH_MAC_DINH } from "./danh-muc";
 import { hanBaoHanh } from "./ngay";
+import type { TrangThai } from "./kieu";
 
 /**
  * Hạn bảo hành ghi sẵn vào từng hạng mục ngay lúc tạo đơn, để tra cứu về sau
@@ -22,4 +23,26 @@ export async function ghiHangMuc(khachId: string, dichVu: string[], moc: Date) {
     };
   });
   await db().from("don_hang_muc").insert(rows);
+}
+
+/**
+ * Đồng bộ hạng mục bảo hành của một đơn.
+ *
+ * Chỉ đơn **đã chốt** mới có bảo hành — khách mới hỏi giá hay đã từ chối thì
+ * chưa làm gì, không có gì để bảo hành. Ghi hạng mục cho cả những đơn đó là
+ * hai tháng nữa danh sách "sắp hết hạn" đầy người chưa từng mua, gọi vừa mất
+ * công vừa mất mặt.
+ *
+ * Gọi sau mỗi lần trạng thái hoặc danh sách dịch vụ của đơn đổi. Xoá trước rồi
+ * ghi lại, nên đơn từ "đã chốt" đổi về "hỏi giá" là hạng mục biến mất theo.
+ */
+export async function dongBoHangMuc(
+  khachId: string,
+  trangThai: TrangThai,
+  dichVu: string[],
+  moc: Date
+) {
+  await db().from("don_hang_muc").delete().eq("khach_hang_id", khachId);
+  if (trangThai !== "da_chot") return;
+  await ghiHangMuc(khachId, dichVu, moc);
 }

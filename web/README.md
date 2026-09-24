@@ -1,6 +1,7 @@
-# Bản thật — giai đoạn 2
+# Bản thật — giai đoạn 3
 
-App nhập khách cho thợ, chạy thật với database. Next.js + Supabase.
+App nhập khách cho thợ **và** phần phân tích cho admin, chạy thật với
+database. Next.js + Supabase.
 
 > Bản demo giao diện nằm ở `../demo` và vẫn chạy độc lập, không liên quan tới
 > thư mục này.
@@ -9,7 +10,7 @@ App nhập khách cho thợ, chạy thật với database. Next.js + Supabase.
 
 | Chỗ | Nhận cái gì | KHÔNG nhận |
 |---|---|---|
-| **Supabase → SQL Editor** | Chỉ lệnh SQL — nội dung file `supabase/migrations/0001_khoi_tao.sql` | `cd`, `npm`, `node`… dán vào là báo `syntax error` |
+| **Supabase → SQL Editor** | Chỉ lệnh SQL — nội dung các file trong `supabase/migrations/` | `cd`, `npm`, `node`… dán vào là báo `syntax error` |
 | **Terminal / dòng lệnh** | `npm install`, `npm run dev`, `node scripts/...` | SQL |
 
 Dán nhầm cũng không hỏng gì, nó chỉ báo lỗi rồi thôi.
@@ -26,6 +27,14 @@ Mở **SQL Editor** → **New query** → mở file `supabase/migrations/0001_kh
 trên GitHub, copy **toàn bộ** nội dung, dán vào → bấm **Run**.
 
 Chạy đúng thì thấy `Success. No rows returned`.
+
+Rồi làm y hệt với file thứ hai: `supabase/migrations/0002_phan_tich.sql`
+(**New query** mới, dán, **Run**). File này thêm cột đánh dấu khách cũ và mấy
+chỉ mục cho màn phân tích.
+
+> **Đang chạy bản cũ rồi mới cập nhật?** Chỉ cần chạy `0002_phan_tich.sql`,
+> đừng chạy lại `0001` — các màn Phân tích, Duyệt đơn, Bảo hành sẽ báo lỗi cho
+> tới khi chạy xong file này.
 
 ### 2. Đưa lên Vercel
 
@@ -187,7 +196,27 @@ scripts/           tạo admin đầu tiên
 kiem-tra/          kiểm thử
 ```
 
-## Chưa có (giai đoạn 3)
+## Màn admin có gì
 
-Duyệt đơn, gán nguồn quảng cáo, nhập báo cáo cuộc gọi Google Ads, tra cứu bảo
-hành, và toàn bộ biểu đồ phân tích. Xem `../docs/KE-HOACH.md`.
+Vào `/admin` bằng mã PIN admin. Bốn tab:
+
+| Tab | Dùng để làm gì |
+|---|---|
+| **Phân tích** | Khung giờ khách gọi, từng kênh quảng cáo mang về bao nhiêu, giá 1 khách / 1 đơn / ROAS, khách cũ quay lại, giới tính, dịch vụ, phường xã, lý do từ chối, gợi ý chỉnh quảng cáo, xuất Excel |
+| **Duyệt đơn** | Xác nhận đơn thợ vừa nhập, gán nguồn quảng cáo (lẻ hoặc hàng loạt), cảnh báo đỏ khi trùng số, sửa mọi trường, và **nhập báo cáo cuộc gọi Google Ads** để gán nguồn hàng loạt |
+| **Khách cũ & bảo hành** | Tra theo số điện thoại, hạn bảo hành từng hạng mục, danh sách sắp hết hạn nên gọi, ghi nhận từng lần đi bảo hành |
+| **Cài đặt** | Thêm thợ, đặt PIN, mã QR phát app; sửa hotline từng kênh và chi phí tháng |
+
+Bộ lọc ở màn Phân tích: khoảng thời gian, nguồn, thợ, dịch vụ, phường xã.
+
+> Tiền quảng cáo chỉ ghi được theo **kênh**, không chẻ nhỏ theo thợ / dịch vụ /
+> phường xã. Nên khi lọc mấy mục đó, giá 1 khách và ROAS chỉ để tham khảo — màn
+> hình có báo sẵn dòng nhắc.
+
+## Chưa có (giai đoạn 4)
+
+- **Tự lấy chi phí từ Google Ads API** thay cho nhập tay từng tháng (hiện chi phí
+  nhập ở tab Cài đặt, còn số điện thoại người gọi thì nhập bằng file báo cáo)
+- Gửi ngược chuyển đổi về Google Ads, nhắc việc, xếp hạng thợ, báo cáo tự gửi
+
+Xem `../docs/KE-HOACH.md`.

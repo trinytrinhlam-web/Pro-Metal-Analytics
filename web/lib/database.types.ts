@@ -35,6 +35,7 @@ type KhachRow = {
   ghi_chu: string | null;
   giay_goi: number | null;
   tu_bao_cao: boolean;
+  la_khach_cu: boolean;
   tho_id: string | null;
   khoa_client: string | null;
   da_duyet: boolean;

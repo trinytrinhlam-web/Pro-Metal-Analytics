@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   description: "Nhập khách và phân tích quảng cáo cho xưởng cửa sắt",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Lead Radar", statusBarStyle: "default" },
+  // Khai báo icon ở đây, nếu không trình duyệt cứ đi xin /favicon.ico rồi ăn
+  // 404, còn iPhone lưu app ra màn hình chính bằng ảnh chụp trang thay vì icon.
+  icons: {
+    icon: [{ url: "/icon-192.png", type: "image/png", sizes: "192x192" }],
+    shortcut: "/icon-192.png",
+    apple: [{ url: "/icon-192.png", sizes: "180x180" }],
+  },
 };
 
 export const viewport: Viewport = {

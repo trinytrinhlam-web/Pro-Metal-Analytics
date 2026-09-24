@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { loiHeThong } from "@/lib/loi";
 import { phienHienTai } from "@/lib/phien";
 import { chuanSdt, DICH_VU } from "@/lib/danh-muc";
-import { ghiHangMuc } from "@/lib/bao-hanh";
+import { dongBoHangMuc } from "@/lib/bao-hanh";
+import { daTungGoi } from "@/lib/khach";
 import type { DonMoi } from "@/lib/kieu";
 
 const COT = "id, thoi_diem, ten, so_dien_thoai, gioi_tinh, hotline_id, dich_vu, khu_vuc, loai_cong_trinh, trang_thai, ly_do_tu_choi, doanh_thu, ghi_chu, giay_goi, tu_bao_cao, tho_id, da_duyet, tao_luc, sua_luc" as const;
@@ -52,6 +53,10 @@ export async function POST(req: Request) {
   }
 
   const dichVu = (b.dich_vu ?? []).filter((d) => DICH_VU.includes(d));
+
+  // Khách cũ hay mới quyết một lần ở đây rồi ghi cứng vào đơn. Cách nhau dưới
+  // 12 tiếng thì coi là nhập trùng chứ không phải khách quay lại.
+  const laKhachCu = await daTungGoi(sdt, b.thoi_diem ? new Date(b.thoi_diem) : new Date());
   const thoiDiem = b.thoi_diem ? new Date(b.thoi_diem) : new Date();
   const trangThai = b.trang_thai ?? "hoi_gia";
 
@@ -71,6 +76,7 @@ export async function POST(req: Request) {
       doanh_thu: typeof b.doanh_thu === "number" ? b.doanh_thu : null,
       ghi_chu: b.ghi_chu?.trim() || null,
       khoa_client: b.khoa_client ?? null,
+      la_khach_cu: laKhachCu,
       tho_id: phien.thoId,
       da_duyet: false,
     })
@@ -79,6 +85,7 @@ export async function POST(req: Request) {
 
   if (error) return loiHeThong("don: doc/ghi", error);
 
-  await ghiHangMuc(data!.id as string, dichVu, thoiDiem);
+  await dongBoHangMuc(data!.id as string, trangThai, dichVu, thoiDiem);
   return NextResponse.json({ don: data });
 }
+

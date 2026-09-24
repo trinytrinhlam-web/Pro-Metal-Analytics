@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { loiHeThong } from "@/lib/loi";
 import { phienHienTai } from "@/lib/phien";
 import { chuanSdt, DICH_VU } from "@/lib/danh-muc";
-import { ghiHangMuc } from "@/lib/bao-hanh";
-import type { DonMoi } from "@/lib/kieu";
+import { dongBoHangMuc } from "@/lib/bao-hanh";
+import type { DonMoi, TrangThai } from "@/lib/kieu";
 
 const COT = "id, thoi_diem, ten, so_dien_thoai, gioi_tinh, hotline_id, dich_vu, khu_vuc, loai_cong_trinh, trang_thai, ly_do_tu_choi, doanh_thu, ghi_chu, giay_goi, tu_bao_cao, tho_id, da_duyet, tao_luc, sua_luc" as const;
 
@@ -16,7 +16,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
 
   const { data: cu, error: loiDoc } = await db()
     .from("khach_hang")
-    .select("id, tho_id, thoi_diem, dich_vu")
+    .select("id, tho_id, thoi_diem, dich_vu, trang_thai")
     .eq("id", id)
     .maybeSingle();
   if (loiDoc) return loiHeThong("don/[id]: doc don", loiDoc);
@@ -77,10 +77,17 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     .single();
   if (error) return loiHeThong("don/[id]: cap nhat", error);
 
-  // Đổi hạng mục thì hạn bảo hành phải ghi lại theo đúng ngày làm gốc.
-  if (dichVuMoi) {
-    await db().from("don_hang_muc").delete().eq("khach_hang_id", id);
-    await ghiHangMuc(id, dichVuMoi, new Date(cu.thoi_diem as string));
+  // Đổi hạng mục hoặc đổi trạng thái thì hạn bảo hành phải ghi lại theo đúng
+  // ngày làm gốc. Đơn quay về "hỏi giá" / "từ chối" là hạng mục bị gỡ luôn.
+  const doiDichVu = dichVuMoi !== null;
+  const doiTrangThai = b.trang_thai !== undefined && b.trang_thai !== cu.trang_thai;
+  if (doiDichVu || doiTrangThai) {
+    await dongBoHangMuc(
+      id,
+      (b.trang_thai ?? cu.trang_thai) as TrangThai,
+      dichVuMoi ?? ((cu.dich_vu as string[] | null) ?? []),
+      new Date(cu.thoi_diem as string)
+    );
   }
   return NextResponse.json({ don: data });
 }

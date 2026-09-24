@@ -36,6 +36,7 @@ export type KhachHang = {
   ghi_chu: string | null;
   giay_goi: number | null;
   tu_bao_cao: boolean;
+  la_khach_cu: boolean;
   tho_id: string | null;
   da_duyet: boolean;
   tao_luc: string;

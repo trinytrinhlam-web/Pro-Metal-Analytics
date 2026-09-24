@@ -115,25 +115,44 @@ Code nằm ở `web/`. Hướng dẫn cài đặt trong `web/README.md`.
 **Chạy thử 1–2 tuần với khách thật trước khi làm tiếp.** Dữ liệu thật sẽ cho
 thấy cần thêm bớt trường nào — làm dashboard trước khi có dữ liệu là làm mò.
 
-### Giai đoạn 3 — Bản thật, phần phân tích (ước 4–5 ngày làm)
+### Giai đoạn 3 — Bản thật, phần phân tích ✅ xong
 
-- **Màn hình "Duyệt đơn"**: kiểm tra tự động, cảnh báo đỏ khi trùng số điện thoại
+- ✅ **Màn hình "Duyệt đơn"**: kiểm tra tự động, cảnh báo đỏ khi trùng số điện thoại
   (tách nhập trùng với khách cũ gọi lại), gán nguồn lẻ và hàng loạt, sửa mọi
   trường tại chỗ, xoá đơn trùng
-- **Nhập báo cáo cuộc gọi Google Ads**: khớp theo số điện thoại, gán nguồn hàng
+- ✅ **Nhập báo cáo cuộc gọi Google Ads**: khớp theo số điện thoại, gán nguồn hàng
   loạt, sửa số thợ gõ sai, và tạo đơn nháp cho cuộc gọi chưa có đơn nào — xem
   `GOOGLE-ADS.md`
-- **Bảng khách cũ quay lại**: số lượt, doanh thu, tỷ lệ chốt so với khách mới
-- **Tab "Khách cũ & bảo hành"**: tra cứu theo số điện thoại, hạn bảo hành từng
+- ✅ **Bảng khách cũ quay lại**: số lượt, doanh thu, tỷ lệ chốt so với khách mới
+- ✅ **Tab "Khách cũ & bảo hành"**: tra cứu theo số điện thoại, hạn bảo hành từng
   hạng mục, danh sách sắp hết hạn cần gọi, ghi nhận lần bảo hành — xem `BAO-HANH.md`
-- Toàn bộ biểu đồ trong demo, chạy trên dữ liệu thật
-- Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
-- Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS
-- **Tự lấy chi phí từ Google Ads API** thay cho nhập tay
-- Xuất Excel
-- Gợi ý tối ưu quảng cáo tự động
+- ✅ Toàn bộ biểu đồ trong demo, chạy trên dữ liệu thật
+- ✅ Bộ lọc: khoảng thời gian, nguồn, thợ, dịch vụ, khu vực
+- ✅ Nhập chi phí quảng cáo từng kênh theo tháng → tính CPL, CPA, ROAS
+- ✅ Xuất Excel
+- ✅ Gợi ý tối ưu quảng cáo tự động
+- ⏭ **Tự lấy chi phí từ Google Ads API** — dời sang giai đoạn 4. Việc này cần tài
+  khoản Google Cloud, developer token của Google Ads và luồng OAuth, tức là một
+  mảng riêng chứ không phải một màn hình nữa. Trong lúc chưa có, chi phí tháng
+  nhập tay ở tab Cài đặt — mỗi kênh một lần mỗi tháng, mất chừng một phút.
+
+**Phải chạy `supabase/migrations/0002_phan_tich.sql`** trên Supabase SQL Editor
+trước khi mấy màn này hoạt động.
+
+Vài quyết định đáng nhớ trong lúc làm:
+
+- **Chỉ đơn "đã chốt" mới sinh hạn bảo hành.** Ghi cho cả đơn mới hỏi giá thì hai
+  năm sau danh sách "sắp hết hạn" toàn người chưa từng mua. Đổi trạng thái đơn là
+  hạng mục bảo hành theo đó mà sinh ra hoặc mất đi.
+- **CPL / CPA / ROAS chỉ tính trên khách mới.** Khách cũ gọi lại không tốn đồng
+  quảng cáo nào, gộp vào là tự khen nhầm.
+- **Lọc theo thợ / dịch vụ / phường xã thì mấy chỉ số tiền chỉ để tham khảo**, vì
+  chi phí quảng cáo ghi theo kênh chứ không chẻ nhỏ được. Màn hình báo sẵn.
 
 ### Giai đoạn 4 — Nâng cấp (làm khi cần)
+
+- **Tự lấy chi phí quảng cáo từ Google Ads API** thay cho nhập tay (dời từ giai
+  đoạn 3 xuống)
 
 - Nhắc việc: khách "hỏi giá" quá 3 ngày chưa chốt → nhắc gọi lại
 - Bảng xếp hạng thợ theo tháng

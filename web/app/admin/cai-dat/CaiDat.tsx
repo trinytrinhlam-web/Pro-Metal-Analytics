@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import type { Hotline, Tho } from "@/lib/kieu";
 
 const MAU_CHON: [string, string][] = [
@@ -8,7 +7,7 @@ const MAU_CHON: [string, string][] = [
   ["var(--s4)", "Vàng"], ["var(--s5)", "Hồng"],
 ];
 
-export default function CaiDat({ ten }: { ten: string }) {
+export default function CaiDat({ ten: _ten }: { ten: string }) {
   const [dsTho, setDsTho] = useState<Tho[]>([]);
   const [dsHl, setDsHl] = useState<Hotline[]>([]);
   const [loi, setLoi] = useState("");
@@ -62,16 +61,8 @@ export default function CaiDat({ ten }: { ten: string }) {
   }
 
   return (
-    <div className="app" style={{ maxWidth: 760 }}>
-      <header className="appbar">
-        <div className="who">
-          <b>Cài đặt</b>
-          <span>{ten} · admin</span>
-        </div>
-        <Link href="/nhap" className="pill" style={{ textDecoration: "none" }}>Màn nhập →</Link>
-      </header>
-
-      <div className="scroll" style={{ paddingBottom: 40 }}>
+    <>
+      <div className="panel">
         {loi && <div className="hint" style={{ borderLeftColor: "var(--crit)", marginBottom: 14 }}>{loi}</div>}
 
         <h2 style={{ fontSize: 16, margin: "0 0 4px" }}>Phát app cho thợ</h2>
@@ -245,10 +236,7 @@ export default function CaiDat({ ten }: { ten: string }) {
           </button>
         </div>
 
-        <p style={{ fontSize: 12.5, color: "var(--ink3)", marginTop: 28 }}>
-          Phần duyệt đơn, bảo hành và biểu đồ phân tích nằm ở giai đoạn 3.
-        </p>
       </div>
-    </div>
+    </>
   );
 }
