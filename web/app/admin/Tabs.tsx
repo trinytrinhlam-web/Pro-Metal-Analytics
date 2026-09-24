@@ -10,9 +10,21 @@ const MUC = [
   { href: "/admin/cai-dat", chu: "Cài đặt" },
 ];
 
+type Thieu = { file: string; them: string };
+
 export default function Tabs() {
   const duong = usePathname();
   const [cho, setCho] = useState(0);
+  const [thieu, setThieu] = useState<Thieu[]>([]);
+
+  // Thợ là người thấy lỗi, còn chủ tiệm mới sửa được — nên báo ở đây, khỏi
+  // phải chờ thợ gọi điện mách mới biết database chưa cập nhật.
+  useEffect(() => {
+    fetch("/api/admin/tinh-trang")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => j && setThieu(j.thieu ?? []))
+      .catch(() => {});
+  }, []);
 
   // Số đơn chờ duyệt hiện ngay trên tab, khỏi phải bấm vào mới biết.
   useEffect(() => {
@@ -23,13 +35,46 @@ export default function Tabs() {
   }, [duong]);
 
   return (
-    <nav className="qt-nav">
-      {MUC.map((m) => (
-        <Link key={m.href} href={m.href} aria-current={duong === m.href ? "page" : undefined}>
-          {m.chu}
-          {m.href === "/admin/duyet" && cho > 0 && <span className="ct">{cho}</span>}
-        </Link>
-      ))}
-    </nav>
+    <>
+      <nav className="qt-nav">
+        {MUC.map((m) => (
+          <Link key={m.href} href={m.href} aria-current={duong === m.href ? "page" : undefined}>
+            {m.chu}
+            {m.href === "/admin/duyet" && cho > 0 && <span className="ct">{cho}</span>}
+          </Link>
+        ))}
+      </nav>
+
+      {thieu.length > 0 && (
+        <div className="panel" style={{ background: "var(--crit-bg)", borderColor: "var(--crit)" }}>
+          <h2 style={{ color: "var(--crit)" }}>⚠ Thợ đang không lưu được đơn</h2>
+          <p className="sub">
+            Phần mềm đã lên bản mới nhưng database chưa cập nhật theo, nên mỗi lần thợ bấm
+            Lưu là hỏng. Đơn thợ nhập vẫn nằm an toàn trên máy họ và tự gửi lên ngay sau khi
+            anh làm xong mấy bước dưới — không mất đơn nào.
+          </p>
+          <ol style={{ margin: "10px 0 0", paddingLeft: 20, fontSize: 14, lineHeight: 1.85 }}>
+            <li>Mở <b>Supabase</b> → <b>SQL Editor</b> → <b>New query</b></li>
+            <li>
+              Mở file{" "}
+              {thieu.map((t, i) => (
+                // Tên file dài hơn màn hình điện thoại hẹp, phải cho ngắt dòng
+                // giữa chừng chứ không thì chữ chạy ra ngoài khung.
+                <span key={t.file} style={{ wordBreak: "break-all" }}>
+                  {i > 0 && ", "}
+                  <b>supabase/migrations/{t.file}</b>
+                </span>
+              ))}{" "}
+              trên GitHub, copy <b>toàn bộ</b>, dán vào
+            </li>
+            <li>Bấm <b>Run</b> → thấy <i>Success</i> là xong</li>
+            <li>Tải lại trang này, dòng đỏ này biến mất</li>
+          </ol>
+          <p className="sub" style={{ marginTop: 10 }}>
+            Chạy lại nhiều lần cũng không sao, không mất dữ liệu cũ.
+          </p>
+        </div>
+      )}
+    </>
   );
 }

@@ -59,9 +59,14 @@ export default function NhapApp({
   const mrRef = useRef<MediaRecorder | null>(null);
   const dongHo = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const hcToast = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bao = useCallback((chu: string, xau = false) => {
+    // Huỷ hẹn giờ của câu trước. Thợ lưu liền mấy khách thì hẹn giờ cũ sẽ xoá
+    // mất câu mới — bấm Lưu xong chớp cái là hết chữ, không kịp đọc là đã lưu
+    // được hay chưa.
+    if (hcToast.current) clearTimeout(hcToast.current);
     setToast({ chu, xau });
-    setTimeout(() => setToast(null), 2600);
+    hcToast.current = setTimeout(() => setToast(null), 2600);
   }, []);
 
   const napHomNay = useCallback(async () => {
@@ -259,7 +264,20 @@ export default function NhapApp({
       });
       if (r.status === 401) { setTho(null); return; }
       const j = await r.json();
-      if (!r.ok) return bao(j.loi || "Lưu không được.", true);
+      if (!r.ok) {
+        // Máy chủ báo database chưa cập nhật. Thợ ngồi thử lại bao lâu cũng
+        // không hết — phải có người vào Supabase chạy file SQL. Nên cất đơn
+        // vào máy y như lúc mất sóng: thợ nhập tiếp bình thường, cập nhật
+        // xong là cả đống đơn tự bay lên, không mất đơn nào, không gõ lại.
+        if (j.thieuMigration && !suaId) {
+          themVaoHangDoi({ ...than, khoa_client: taoKhoa(), luc: Date.now() });
+          setCho(soDonCho());
+          bao("✓ Đã lưu trên máy · chờ chủ tiệm cập nhật là tự gửi lên");
+          xongMotDon();
+          return;
+        }
+        return bao(j.loi || "Lưu không được.", true);
+      }
       bao(suaId ? "✓ Đã cập nhật đơn" : voice === "xong" ? "✓ Đã lưu · không giữ lại file ghi âm" : "✓ Đã lưu");
       xongMotDon();
       napHomNay();
