@@ -112,12 +112,14 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
           Mỗi thợ một mã PIN riêng để biết đơn nào ai nhập. Không cần số điện thoại, không cần email.
         </p>
         {dsTho.map((t) => (
-          <div key={t.id} className="lead" style={{ opacity: t.dang_dung ? 1 : 0.55, display: "flex", alignItems: "center" }}>
+          <div key={t.id} className="lead tho-dong" style={{ opacity: t.dang_dung ? 1 : 0.55 }}>
             <span className="mn">
               <b>{t.ten}</b>
               <span>{t.vai_tro === "admin" ? "Admin" : "Thợ"}{t.dang_dung ? "" : " · đã nghỉ"}</span>
             </span>
-            <span style={{ display: "flex", gap: 7 }}>
+            {/* Trên điện thoại ba nút xuống hàng riêng — để chung một hàng thì
+                tên thợ bị ép còn đúng một chữ cái. */}
+            <span className="tho-nut">
               <button
                 className="chip"
                 onClick={() => {
@@ -138,7 +140,7 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
                   if (p) copyLoiNhan(t.ten, p.replace(/\D/g, "").slice(0, 6));
                 }}
               >
-                {daCopy === t.ten ? "✓ Đã copy" : "Lời nhắn Zalo"}
+                {daCopy === t.ten ? "✓ Đã copy" : <><span className="chi-rong">Lời nhắn Zalo</span><span className="chi-hep">Nhắn Zalo</span></>}
               </button>
             </span>
           </div>
@@ -177,17 +179,18 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
         </div>
         {dsHl.map((h) => (
           <div key={h.id} style={{ border: "1px solid var(--line)", borderRadius: 12, padding: 13, marginBottom: 9, opacity: h.dang_dung ? 1 : 0.55 }}>
-            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
+            <div className="hl-dau" style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 10 }}>
               <span style={{ width: 13, height: 13, borderRadius: 4, background: h.mau, flex: "none" }} />
-              <span style={{ flex: 1, minWidth: 110, fontSize: 12.5, color: "var(--ink3)" }}>
-                {h.dang_dung ? "đang dùng" : "đã ngừng dùng"}
+              <span style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
+                <b style={{ fontSize: 14.5, display: "block", overflowWrap: "anywhere" }}>{h.kenh}</b>
+                <span style={{ fontSize: 12, color: "var(--ink3)" }}>{h.dang_dung ? "đang dùng" : "đã ngừng dùng"}</span>
               </span>
               <button className="chip" onClick={() => goi("/api/admin/hotline", "PATCH", { id: h.id, dang_dung: !h.dang_dung })}>
                 {h.dang_dung ? "Cho nghỉ" : "Dùng lại"}
               </button>
               <button className="chip" onClick={() => goi(`/api/admin/hotline?id=${h.id}`, "DELETE")}>Xoá</button>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
+            <div className="hl-o">
               <div>
                 <div className="lb">Số điện thoại</div>
                 <input className="inp" defaultValue={h.so}

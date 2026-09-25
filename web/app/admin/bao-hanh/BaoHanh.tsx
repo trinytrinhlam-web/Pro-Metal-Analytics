@@ -140,11 +140,9 @@ export default function BaoHanh() {
       </div>
 
       {che === "sap" && khach.length > 0 && (
-        <div className="panel">
-          <div className="hint" style={{ borderLeftColor: "var(--warn)" }}>
-            <b>Đây là danh sách nên gọi.</b> Xếp gấp nhất lên đầu. Gọi hỏi thăm trước khi hết bảo
-            hành vừa giữ được khách, vừa hay ra việc mới — mà không tốn đồng quảng cáo nào.
-          </div>
+        <div className="hint" style={{ borderLeftColor: "var(--warn)", margin: "0 0 12px" }}>
+          <b>Đây là danh sách nên gọi.</b> Xếp gấp nhất lên đầu. Gọi hỏi thăm trước khi hết bảo
+          hành vừa giữ được khách, vừa hay ra việc mới — mà không tốn đồng quảng cáo nào.
         </div>
       )}
 
@@ -153,21 +151,35 @@ export default function BaoHanh() {
       ) : khach.length ? (
         khach.map((k) => (
           <div className="kh" key={k.sdt}>
-            <button className="hd" onClick={() => setMo((p) => ({ ...p, [k.sdt]: !p[k.sdt] }))}>
-              <span className="nm">
-                <b>{k.ten || "(chưa có tên)"}</b>
-                <span>
-                  {dinhDangSdt(k.sdt)} · {k.don.length} lần liên hệ · {k.chot.length} đơn đã làm
-                  {k.soBH > 0 && ` · đã bảo hành ${k.soBH} lần`}
+            <div className="kh-dau">
+              <button className="hd" onClick={() => setMo((p) => ({ ...p, [k.sdt]: !p[k.sdt] }))}>
+                <span className="nm">
+                  <b>{k.ten || "(chưa có tên)"}</b>
+                  <span>
+                    {dinhDangSdt(k.sdt)}
+                    <span className="chi-rong"> · {k.don.length} lần liên hệ · {k.chot.length} đơn đã làm</span>
+                    <span className="chi-hep"> · {k.don.length} liên hệ · {k.chot.length} đơn</span>
+                    {k.soBH > 0 && ` · đã bảo hành ${k.soBH} lần`}
+                  </span>
                 </span>
-              </span>
-              <Nhan conLai={k.conLai} />
-              <span className="rt">
-                <b>{ngan(k.tong)}</b>
-                gần nhất {ngayVN(k.cuoi.thoi_diem)}
-              </span>
-              <span style={{ color: "var(--ink3)", fontSize: 15 }}>{mo[k.sdt] ? "▴" : "▾"}</span>
-            </button>
+                <Nhan conLai={k.conLai} />
+                <span className="rt">
+                  <b>{ngan(k.tong)}</b>
+                  <span className="chi-rong">gần nhất {ngayVN(k.cuoi.thoi_diem)}</span>
+                </span>
+                <span className="cv" style={{ color: "var(--ink3)", fontSize: 15 }}>{mo[k.sdt] ? "▴" : "▾"}</span>
+              </button>
+              {/* Danh sách này là để gọi — trên điện thoại bấm là gọi luôn, khỏi
+                  phải nhớ số rồi gõ lại sang app Điện thoại. */}
+              <a className="goi" href={`tel:${k.sdt}`} aria-label={`Gọi ${k.ten || "khách"} ${dinhDangSdt(k.sdt)}`}>
+                {/* Vẽ bằng SVG thay cho emoji 📞: emoji là ống nghe màu đen, trên nền
+                    tối gần như biến mất, mà mỗi hãng điện thoại vẽ một kiểu. */}
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor">
+                  <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z" />
+                </svg>
+                <span>Gọi</span>
+              </a>
+            </div>
             {mo[k.sdt] && (
               <div className="than">
                 {[...k.don].reverse().map((d) => (
@@ -206,10 +218,11 @@ function conLaiCuaDon(d: KhachHang, hm?: HangMuc[]): number[] {
 function Nhan({ conLai }: { conLai: number | null }) {
   if (conLai === null) return <span className="tt tt-het">CHƯA CÓ ĐƠN NÀO</span>;
   const t = trangThaiBH(conLai);
+  // Bản ngắn cho điện thoại: nhãn dài đẩy số tiền xuống dòng riêng.
   return (
     <span className={`tt tt-${t}`}>
-      {t === "con" ? `CÒN BẢO HÀNH ${conLai} NGÀY`
-        : t === "sap" ? `SẮP HẾT · CÒN ${Math.max(0, conLai)} NGÀY`
+      {t === "con" ? <><span className="chi-rong">CÒN BẢO HÀNH {conLai} NGÀY</span><span className="chi-hep">CÒN HẠN · {conLai} NGÀY</span></>
+        : t === "sap" ? <><span className="chi-rong">SẮP HẾT · CÒN {Math.max(0, conLai)} NGÀY</span><span className="chi-hep">SẮP HẾT · {Math.max(0, conLai)} NGÀY</span></>
         : "HẾT BẢO HÀNH"}
     </span>
   );

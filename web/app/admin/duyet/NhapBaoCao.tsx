@@ -176,15 +176,23 @@ export default function NhapBaoCao({
     );
   }
 
+  // Lúc đóng chỉ là một dòng. Nhập file báo cáo là việc làm trên máy tính mỗi
+  // tuần một lần, còn trên điện thoại việc chính là duyệt đơn — không để khung
+  // này chiếm chỗ của đơn đầu tiên.
   if (!mo) {
     return (
-      <div className="imp">
-        <h2>📞 Nhập báo cáo cuộc gọi Google Ads</h2>
-        <p className="sub">
-          Tải báo cáo <b>Chi tiết cuộc gọi</b> từ Google Ads rồi thả vào đây — hệ thống tự khớp theo
-          số điện thoại và gán nguồn hàng loạt. Nhanh hơn ngồi bấm từng đơn.
-        </p>
-        <div className="imbar"><button className="go" onClick={() => setMo(true)}>Mở phần nhập</button></div>
+      <div className="imp gon">
+        <div className="gon-chu">
+          <h2>
+            <span className="chi-rong">📞 Nhập báo cáo cuộc gọi Google Ads</span>
+            <span className="chi-hep">📞 Báo cáo Google Ads</span>
+          </h2>
+          <p className="sub chi-rong">
+            Tải báo cáo <b>Chi tiết cuộc gọi</b> từ Google Ads rồi thả vào đây — hệ thống tự khớp theo
+            số điện thoại và gán nguồn hàng loạt. Nhanh hơn ngồi bấm từng đơn.
+          </p>
+        </div>
+        <button className="go" onClick={() => setMo(true)}>Mở phần nhập</button>
       </div>
     );
   }

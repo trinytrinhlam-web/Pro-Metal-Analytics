@@ -76,28 +76,34 @@ export default function DuyetDon() {
     <>
       <NhapBaoCao ds={ds} hotlines={dangDung} xongThi={nap} />
 
-      <div className="panel">
-        <h2>Duyệt đơn thợ vừa nhập</h2>
-        <p className="sub">
+      <div className="panel dd-dau">
+        <div className="dd-dau-top">
+          <h2>Duyệt đơn thợ vừa nhập</h2>
+          {hienThi.length > 0 && (
+            <button
+              className="lienket"
+              onClick={() => setChon(Object.fromEntries(hienThi.map((d) => [d.id, true])))}
+            >
+              Chọn hết {hienThi.length}
+            </button>
+          )}
+        </div>
+        <p className="sub chi-rong">
           Thợ nhập nhanh, có thể thiếu hoặc sai. Bạn kiểm lại ở đây rồi xác nhận — chỉ đơn đã gán
           nguồn mới tính được kênh nào ra tiền. Sửa gì cũng lưu ngay, không cần bấm lưu.
         </p>
-        <div className="loc" style={{ marginBottom: 0 }}>
-          {([["cho", `Chờ duyệt (${soCho})`], ["loi", `Có vấn đề (${soLoi})`], ["tat", "Tất cả"]] as [Bo, string][])
-            .map(([v, c]) => (
-              <button key={v} className="chip" aria-pressed={bo === v} onClick={() => { setBo(v); setChon({}); }}>
-                {c}
-              </button>
-            ))}
-          {hienThi.length > 0 && (
-            <button
-              className="ghost"
-              style={{ marginLeft: "auto" }}
-              onClick={() => setChon(Object.fromEntries(hienThi.map((d) => [d.id, true])))}
-            >
-              Chọn hết {hienThi.length} đơn
+        <div className="phan" role="group" aria-label="Xem đơn nào">
+          {([
+            ["cho", "Chờ duyệt", "Chờ duyệt", soCho],
+            ["loi", "Có vấn đề", "Vấn đề", soLoi],
+            ["tat", "Tất cả", "Tất cả", null],
+          ] as [Bo, string, string, number | null][]).map(([v, dai, ngan, so]) => (
+            <button key={v} aria-pressed={bo === v} onClick={() => { setBo(v); setChon({}); }}>
+              <span className="chi-rong">{dai}</span>
+              <span className="chi-hep">{ngan}</span>
+              {so !== null && <b>{so}</b>}
             </button>
-          )}
+          ))}
         </div>
         {loi && <div className="hint" style={{ borderLeftColor: "var(--crit)", marginTop: 12 }}>{loi}</div>}
       </div>
@@ -199,7 +205,7 @@ function The({
         </div>
       )}
 
-      <div className="dd-o">
+      <div className="dd-o doi">
         <div>
           <div className="lb">Số điện thoại</div>
           <input className="inp" defaultValue={dinhDangSdt(l.so_dien_thoai)} inputMode="tel"
@@ -215,7 +221,7 @@ function The({
         </div>
       </div>
 
-      <div style={{ marginTop: 12 }}>
+      <div className="dd-nguon">
         <div className="lb">Nguồn quảng cáo <i>khách này gọi từ đâu</i></div>
         <div className="chips">
           {hotlines.map((h) => (

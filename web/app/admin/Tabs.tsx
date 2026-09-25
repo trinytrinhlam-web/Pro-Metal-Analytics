@@ -3,11 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// `ngan` là tên hiện trên điện thoại: bốn tab phải vừa một hàng, không thì
+// thanh tab gãy làm hai dòng và chiếm gần nửa màn hình trước khi thấy dữ liệu.
 const MUC = [
-  { href: "/admin", chu: "Phân tích" },
-  { href: "/admin/duyet", chu: "Duyệt đơn" },
-  { href: "/admin/bao-hanh", chu: "Khách cũ & bảo hành" },
-  { href: "/admin/cai-dat", chu: "Cài đặt" },
+  { href: "/admin", chu: "Phân tích", ngan: "Phân tích" },
+  { href: "/admin/duyet", chu: "Duyệt đơn", ngan: "Duyệt" },
+  { href: "/admin/bao-hanh", chu: "Khách cũ & bảo hành", ngan: "Bảo hành" },
+  { href: "/admin/cai-dat", chu: "Cài đặt", ngan: "Cài đặt" },
 ];
 
 type Thieu = { file: string; them: string };
@@ -36,14 +38,19 @@ export default function Tabs() {
 
   return (
     <>
-      <nav className="qt-nav">
-        {MUC.map((m) => (
-          <Link key={m.href} href={m.href} aria-current={duong === m.href ? "page" : undefined}>
-            {m.chu}
-            {m.href === "/admin/duyet" && cho > 0 && <span className="ct">{cho}</span>}
-          </Link>
-        ))}
-      </nav>
+      {/* Dính ở đầu màn: trang Phân tích dài cả chục màn hình, cuộn xuống rồi
+          muốn sang tab khác thì khỏi phải kéo ngược lên. */}
+      <div className="qt-dinh">
+        <nav className="qt-nav">
+          {MUC.map((m) => (
+            <Link key={m.href} href={m.href} aria-current={duong === m.href ? "page" : undefined}>
+              <span className="chi-rong">{m.chu}</span>
+              <span className="chi-hep">{m.ngan}</span>
+              {m.href === "/admin/duyet" && cho > 0 && <span className="ct">{cho}</span>}
+            </Link>
+          ))}
+        </nav>
+      </div>
 
       {thieu.length > 0 && (
         <div className="panel" style={{ background: "var(--crit-bg)", borderColor: "var(--crit)" }}>

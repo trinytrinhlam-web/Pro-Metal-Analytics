@@ -45,7 +45,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <span>{phien.ten} · admin</span>
         </div>
         <Link href="/nhap" className="ghost" style={{ textDecoration: "none" }}>
-          Màn thợ nhập →
+          <span className="chi-rong">Màn thợ nhập →</span>
+          <span className="chi-hep">Màn thợ →</span>
         </Link>
       </header>
       <Tabs />

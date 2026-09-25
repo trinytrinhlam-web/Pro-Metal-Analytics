@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { ddmm } from "../nhap/tienIch";
 
 /**
@@ -18,9 +19,23 @@ function daMau(p: number) {
 }
 
 export function LuoiGioThu({ luoi, max }: { luoi: number[][]; max: number }) {
+  const o = (v: number, i: number, j: number) => {
+    const dam = max ? Math.round(14 + 86 * Math.pow(v / max, 0.75)) : 0;
+    return (
+      <div
+        className="o"
+        title={`${THU_DAY[i]}, ${GIO_THEO_DOI[j]}h: ${v} khách`}
+        style={{ background: v ? daMau(dam) : "var(--panel2)", color: dam > 58 ? "#fff" : "var(--ink2)" }}
+      >
+        {v || ""}
+      </div>
+    );
+  };
+
   return (
     <>
-      <div className="scrollx">
+      {/* Máy tính: thứ là hàng, giờ là cột. */}
+      <div className="scrollx chi-rong">
         <table className="hm">
           <tbody>
             <tr>
@@ -30,25 +45,39 @@ export function LuoiGioThu({ luoi, max }: { luoi: number[][]; max: number }) {
             {luoi.map((hang, i) => (
               <tr key={i}>
                 <td className="rh">{THU_NGAN[i]}</td>
-                {hang.map((v, j) => {
-                  const dam = max ? Math.round(14 + 86 * Math.pow(v / max, 0.75)) : 0;
-                  return (
-                    <td key={j}>
-                      <div
-                        className="o"
-                        title={`${THU_DAY[i]}, ${GIO_THEO_DOI[j]}h: ${v} khách`}
-                        style={{ background: v ? daMau(dam) : "var(--panel2)", color: dam > 58 ? "#fff" : "var(--ink2)" }}
-                      >
-                        {v || ""}
-                      </div>
-                    </td>
-                  );
-                })}
+                {hang.map((v, j) => <td key={j}>{o(v, i, j)}</td>)}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/*
+        Điện thoại: xoay lại — giờ là hàng, thứ là cột. 17 cột giờ không vừa màn
+        hình hẹp, phải cuộn ngang mới thấy, mà khung đông khách nhất lại hay rơi
+        vào 17–19h ở tít bên phải. Xoay đi thì 7 cột thứ vừa khít, thấy đủ hết.
+      */}
+      <table className="hm hm-doc chi-hep">
+        <colgroup>
+          <col style={{ width: 36 }} />
+          {THU_NGAN.map((t) => <col key={t} />)}
+        </colgroup>
+        <thead>
+          <tr>
+            <th />
+            {THU_NGAN.map((t) => <th key={t}>{t}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {GIO_THEO_DOI.map((h, j) => (
+            <tr key={h}>
+              <td className="rh">{h}h</td>
+              {luoi.map((hang, i) => <td key={i}>{o(hang[j], i, j)}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <div className="chugiai">
         <span>Ít</span>
         {[0, 25, 50, 75, 100].map((p) => (
@@ -62,19 +91,41 @@ export function LuoiGioThu({ luoi, max }: { luoi: number[][]; max: number }) {
 }
 
 export function DuongTheoNgay({ ds }: { ds: { ngay: Date; n: number }[] }) {
-  const W = 720, H = 190, PL = 34, PR = 8, PT = 14, PB = 26;
+  // Vẽ đúng bằng bề rộng khung chứa. Trước đây vẽ khổ 720 rồi ép tối thiểu
+  // 520px: trên điện thoại cả chục ngày gần nhất nằm khuất bên phải, phải cuộn
+  // ngang mới thấy — mà ngày gần nhất lại là thứ cần xem nhất. Vẽ theo bề rộng
+  // thật thì chữ cũng giữ đúng cỡ, không bị thu nhỏ theo hình.
+  const khung = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(720);
+  useEffect(() => {
+    const el = khung.current;
+    if (!el) return;
+    const do_ = () => setW(Math.max(260, Math.round(el.clientWidth)));
+    do_();
+    const ro = new ResizeObserver(do_);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const H = W < 480 ? 170 : 190, PL = 30, PR = 10, PT = 18, PB = 26;
   const max = Math.max(4, ...ds.map((d) => d.n));
   const buoc = (W - PL - PR) / Math.max(1, ds.length - 1);
   const X = (i: number) => PL + i * buoc;
   const Y = (v: number) => PT + (H - PT - PB) * (1 - v / max);
-  const duong = ds.map((p, i) => `${i ? "L" : "M"}${X(i).toFixed(1)} ${Y(p.n).toFixed(1)}`).join(" ");
-  const vung = `${duong} L${X(ds.length - 1).toFixed(1)} ${H - PB} L${PL} ${H - PB} Z`;
-  const cach = Math.max(1, Math.ceil(ds.length / 7));
   const cuoi = ds[ds.length - 1];
+  // Ngày cuối là hôm nay thì mới đi được nửa ngày — số nào cũng thấp, nhìn như
+  // khách tụt hẳn. Vẽ đoạn đó nét đứt và ghi rõ "chưa hết ngày".
+  const nay = new Date();
+  const doDo = !!cuoi && ds.length > 1 && cuoi.ngay.toDateString() === nay.toDateString();
+  const du = doDo ? ds.slice(0, -1) : ds;
+  const duong = du.map((p, i) => `${i ? "L" : "M"}${X(i).toFixed(1)} ${Y(p.n).toFixed(1)}`).join(" ");
+  const vung = `${duong} L${X(du.length - 1).toFixed(1)} ${H - PB} L${PL} ${H - PB} Z`;
+  // Nhãn ngày cách nhau ít nhất ~60px để không đè lên nhau ở màn hẹp.
+  const cach = Math.max(1, Math.ceil(ds.length / Math.max(2, Math.floor((W - PL - PR) / 60))));
 
   return (
-    <div className="scrollx">
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", minWidth: 520 }}
+    <div ref={khung}>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", maxWidth: "100%", height: "auto" }}
            role="img" aria-label="Số khách theo từng ngày">
         {[0, Math.round(max / 2), max].map((t) => (
           <g key={t}>
@@ -84,16 +135,23 @@ export function DuongTheoNgay({ ds }: { ds: { ngay: Date; n: number }[] }) {
         ))}
         <path d={vung} fill="var(--s1)" opacity=".12" />
         <path d={duong} fill="none" stroke="var(--s1)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        {doDo && (
+          <path
+            d={`M${X(ds.length - 2).toFixed(1)} ${Y(ds[ds.length - 2].n).toFixed(1)} L${X(ds.length - 1).toFixed(1)} ${Y(cuoi.n).toFixed(1)}`}
+            fill="none" stroke="var(--s1)" strokeWidth="2" strokeDasharray="4 4" strokeLinecap="round"
+          />
+        )}
         {cuoi && (
           <>
-            <circle cx={X(ds.length - 1)} cy={Y(cuoi.n)} r="4.5" fill="var(--s1)" stroke="var(--panel)" strokeWidth="2" />
+            <circle cx={X(ds.length - 1)} cy={Y(cuoi.n)} r="4.5" strokeWidth="2"
+                    fill={doDo ? "var(--panel)" : "var(--s1)"} stroke={doDo ? "var(--s1)" : "var(--panel)"} />
             <text x={X(ds.length - 1) - 6} y={Y(cuoi.n) - 9} textAnchor="end" fontSize="11.5" fontWeight="700" fill="var(--ink)">
-              {cuoi.n} khách
+              {doDo ? `hôm nay ${cuoi.n} khách (chưa hết ngày)` : `${cuoi.n} khách`}
             </text>
           </>
         )}
         {ds.map((p, i) => i % cach ? null : (
-          <text key={i} x={X(i)} y={H - 7} textAnchor="middle" fontSize="10.5" fill="var(--ink3)">
+          <text key={i} x={X(i)} y={H - 7} textAnchor={i === 0 ? "start" : "middle"} fontSize="10.5" fill="var(--ink3)">
             {ddmm(p.ngay)}
           </text>
         ))}
@@ -123,20 +181,36 @@ export function Vong({ a, b, nhanA, nhanB }: { a: number; b: number; nhanA: stri
   );
 }
 
+/**
+ * Thanh ngang so sánh độ lớn.
+ *
+ * Mọi hàng phải có cùng điểm bắt đầu và cùng độ dài rãnh, không thì mắt so độ
+ * dài thanh là so sai: trước đây mỗi hàng tự co cột tên theo chữ của nó, tên
+ * dài thì thanh bắt đầu muộn và rãnh ngắn lại — 44 triệu trông dài gần bằng 56
+ * triệu. Giờ cột tên và cột số rộng cố định theo chữ dài nhất trong cả bảng.
+ * Trên điện thoại thì tên nằm trên, thanh chạy hết bề ngang bên dưới.
+ */
 export function ThanhNgang({
   ds, mau = "var(--s1)", dinhDang,
 }: {
   ds: [string, number][]; mau?: string; dinhDang?: (n: number) => string;
 }) {
   if (!ds.length) return <p style={{ color: "var(--ink3)", fontSize: 13 }}>Chưa có dữ liệu trong kỳ này.</p>;
-  const max = ds[0][1] || 1;
+  const max = Math.max(1, ...ds.map(([, v]) => v));
+  const hang = ds.map(([ten, v]) => ({ ten, v, chu: dinhDang ? dinhDang(v) : String(v) }));
+  const dai = (xs: string[]) => Math.max(...xs.map((x) => x.length));
+  const cot = {
+    "--cn": `${Math.min(dai(hang.map((h) => h.ten)), 30) + 1}ch`,
+    "--cv": `${dai(hang.map((h) => h.chu)) + 1}ch`,
+  } as React.CSSProperties;
+
   return (
-    <div className="hthanh">
-      {ds.map(([ten, v]) => (
-        <div className="r" key={ten}>
-          <span>{ten}</span>
-          <div className="thanh"><i style={{ width: `${Math.round((v / max) * 100)}%`, background: mau }} /></div>
-          <span className="v">{dinhDang ? dinhDang(v) : v}</span>
+    <div className="hthanh" style={cot}>
+      {hang.map((h) => (
+        <div className="r" key={h.ten}>
+          <span className="t">{h.ten}</span>
+          <div className="thanh"><i style={{ width: `${Math.round((h.v / max) * 100)}%`, background: mau }} /></div>
+          <span className="v">{h.chu}</span>
         </div>
       ))}
     </div>

@@ -7,7 +7,7 @@ import {
 } from "@/lib/phan-tich";
 import { ngan, vnd } from "../nhap/tienIch";
 import { DuongTheoNgay, GIO_THEO_DOI, LuoiGioThu, THU_DAY, ThanhNgang, Vong } from "./bieu-do";
-import { DICH_VU } from "@/lib/danh-muc";
+import { DICH_VU, dinhDangSdt } from "@/lib/danh-muc";
 import type { Hotline, KhachHang } from "@/lib/kieu";
 
 const KY: [Ky, string][] = [["7", "7 ngày qua"], ["30", "30 ngày qua"], ["thang", "Tháng này"], ["truoc", "Tháng trước"]];
@@ -19,6 +19,7 @@ export default function PhanTich() {
   const [tho, setTho] = useState("");
   const [dichVu, setDichVu] = useState("");
   const [khuVuc, setKhuVuc] = useState("");
+  const [moLoc, setMoLoc] = useState(false);
   const [ds, setDs] = useState<KhachHang[]>([]);
   const [dsTruoc, setDsTruoc] = useState<KhachHang[]>([]);
   const [hotlines, setHotlines] = useState<Hotline[]>([]);
@@ -93,6 +94,7 @@ export default function PhanTich() {
   }, [ds, dsTruoc, hotlines, ky, nguon, loc]);
 
   const { A, P, nay } = so;
+  const soLoc = [nguon, tho, dichVu, khuVuc].filter(Boolean).length;
   const [tu] = khoangKy(ky);
 
   if (loi) {
@@ -108,37 +110,49 @@ export default function PhanTich() {
 
   return (
     <>
-      <div className="loc">
-        <select value={ky} onChange={(e) => setKy(e.target.value as Ky)}>
+      {/*
+        Trên điện thoại chỉ để một hàng: chọn kỳ (dùng nhiều nhất) + nút Lọc +
+        tải lại. Bốn bộ lọc kia bấm Lọc mới mở ra — để sẵn cả bảy nút thì gãy
+        thành năm dòng, chiếm nửa màn hình trước khi thấy con số nào.
+        Trên máy tính thì vẫn bày hết ra một hàng như cũ.
+      */}
+      <div className={`loc loc-pt${moLoc ? " mo" : ""}`}>
+        <select value={ky} onChange={(e) => setKy(e.target.value as Ky)} aria-label="Khoảng thời gian">
           {KY.map(([v, c]) => <option key={v} value={v}>{c}</option>)}
         </select>
-        <select value={nguon} onChange={(e) => setNguon(e.target.value)}>
-          <option value="">Tất cả nguồn</option>
-          {hotlines.map((h) => (
-            <option key={h.id} value={h.id}>{h.kenh}{h.dang_dung ? "" : " (ngừng dùng)"}</option>
-          ))}
-          <option value="__chua__">Chưa rõ nguồn</option>
-        </select>
-        <select value={tho} onChange={(e) => setTho(e.target.value)}>
-          <option value="">Tất cả thợ</option>
-          {dsTho.map((t) => <option key={t.id} value={t.id}>{t.ten}</option>)}
-        </select>
-        <select value={dichVu} onChange={(e) => setDichVu(e.target.value)}>
-          <option value="">Tất cả dịch vụ</option>
-          {DICH_VU.map((d) => <option key={d} value={d}>{d}</option>)}
-        </select>
-        <select value={khuVuc} onChange={(e) => setKhuVuc(e.target.value)}>
-          <option value="">Tất cả phường xã</option>
-          {khuVucCoKhach.map(([k, n]) => <option key={k} value={k}>{k} ({n})</option>)}
-        </select>
-        {(dichVu || khuVuc || nguon || tho) && (
-          <button className="ghost" onClick={() => { setNguon(""); setTho(""); setDichVu(""); setKhuVuc(""); }}>
-            ✕ Bỏ lọc
-          </button>
-        )}
-        <button className="ghost" onClick={nap}>↻ Tải lại</button>
-        <button className="ghost" onClick={() => xuatCsv(nay, hotlines)}>⬇ Xuất Excel</button>
-        {dangNap && <span style={{ fontSize: 13, color: "var(--ink3)" }}>đang đọc…</span>}
+        <button className="ghost loc-nut chi-hep" aria-expanded={moLoc} onClick={() => setMoLoc((v) => !v)}>
+          Lọc{soLoc ? ` (${soLoc})` : ""} {moLoc ? "▴" : "▾"}
+        </button>
+        <div className="loc-them">
+          <select value={nguon} onChange={(e) => setNguon(e.target.value)} aria-label="Nguồn">
+            <option value="">Tất cả nguồn</option>
+            {hotlines.map((h) => (
+              <option key={h.id} value={h.id}>{h.kenh}{h.dang_dung ? "" : " (ngừng dùng)"}</option>
+            ))}
+            <option value="__chua__">Chưa rõ nguồn</option>
+          </select>
+          <select value={tho} onChange={(e) => setTho(e.target.value)} aria-label="Thợ">
+            <option value="">Tất cả thợ</option>
+            {dsTho.map((t) => <option key={t.id} value={t.id}>{t.ten}</option>)}
+          </select>
+          <select value={dichVu} onChange={(e) => setDichVu(e.target.value)} aria-label="Dịch vụ">
+            <option value="">Tất cả dịch vụ</option>
+            {DICH_VU.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <select value={khuVuc} onChange={(e) => setKhuVuc(e.target.value)} aria-label="Phường xã">
+            <option value="">Tất cả phường xã</option>
+            {khuVucCoKhach.map(([k, n]) => <option key={k} value={k}>{k} ({n})</option>)}
+          </select>
+          {soLoc > 0 && (
+            <button className="ghost" onClick={() => { setNguon(""); setTho(""); setDichVu(""); setKhuVuc(""); }}>
+              ✕ Bỏ lọc
+            </button>
+          )}
+          <button className="ghost" onClick={() => xuatCsv(nay, hotlines)}>⬇ Xuất Excel</button>
+        </div>
+        <button className="ghost loc-tai" onClick={nap} aria-label="Tải lại">
+          {dangNap ? "…" : "↻"}<span className="chi-rong"> {dangNap ? "Đang đọc" : "Tải lại"}</span>
+        </button>
       </div>
 
       {/*
@@ -160,11 +174,11 @@ export default function PhanTich() {
 
       {A.chuaDuyet > 0 && (
         <div className="panel" style={{ background: "var(--warn-bg)", borderColor: "var(--warn)" }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <span style={{ flex: 1, minWidth: 220, fontSize: 13.5 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <span style={{ flex: 1, minWidth: 0, fontSize: 13.5 }}>
               <b>{A.chuaDuyet} đơn chưa xác nhận.</b> Chưa gán nguồn thì chưa biết kênh nào ra tiền.
             </span>
-            <Link href="/admin/duyet" className="ghost" style={{ textDecoration: "none" }}>Duyệt ngay →</Link>
+            <Link href="/admin/duyet" className="ghost" style={{ textDecoration: "none", flex: "none" }}>Duyệt ngay →</Link>
           </div>
         </div>
       )}
@@ -267,7 +281,7 @@ function BangNguon({ rows }: { rows: ReturnType<typeof theoNguon> }) {
       <p className="sub">
         Mỗi kênh quảng cáo một số điện thoại riêng, nên tiền bỏ ra và tiền thu về khớp đúng từng kênh.
       </p>
-      <div className="scrollx">
+      <div className="scrollx chi-rong">
         <table className="bang">
           <thead>
             <tr>
@@ -306,6 +320,41 @@ function BangNguon({ rows }: { rows: ReturnType<typeof theoNguon> }) {
             ))}
           </tbody>
         </table>
+      </div>
+      {/*
+        Điện thoại: mỗi kênh một thẻ. Bảng 10 cột trên màn hẹp chỉ thấy tới cột
+        "Chốt", còn doanh thu, chi phí, giá 1 khách, ROAS — đúng mấy số dùng để
+        quyết định tăng giảm ngân sách — thì khuất hết bên phải.
+      */}
+      <div className="nguon-the chi-hep">
+        {rows.map((r) => (
+          <div className="nt" key={r.hotline?.id ?? "chua"}>
+            <div className="nt-dau">
+              <span className="sw" style={{ background: r.hotline?.mau ?? "var(--ink3)" }} />
+              <span className="nt-ten">
+                <b>{r.hotline?.kenh ?? "Chưa rõ nguồn"}</b>
+                <span>{r.hotline?.so ?? "chưa gán"}{r.hotline && !r.hotline.dang_dung ? " · ngừng dùng" : ""}</span>
+              </span>
+              <span className="nt-roas">
+                <b className={r.chi ? (r.roas < 3 ? "xuong" : "len") : "bang"}>
+                  {r.chi ? `${fpc(Math.round(r.roas * 10) / 10)}×` : "—"}
+                </b>
+                <small>ROAS</small>
+              </span>
+            </div>
+            <div className="nt-so">
+              <div><small>Khách</small><b>{r.n}</b>{r.cu > 0 && <i>{r.cu} cũ</i>}</div>
+              <div>
+                <small>Chốt</small><b>{r.chot}</b>
+                <i className={`nhan ${r.ty >= 45 ? "n-good" : r.ty >= 28 ? "n-warn" : "n-crit"}`}>{fpc(r.ty)}%</i>
+              </div>
+              <div><small>Doanh thu</small><b>{ngan(r.dt)}</b></div>
+              <div><small>Chi phí QC</small><b>{r.chi ? ngan(r.chi) : "—"}</b></div>
+              <div><small>1 khách mới</small><b>{r.chi ? ngan(Math.round(r.cpl / 1000) * 1000) : "—"}</b></div>
+              <div><small>1 đơn mới</small><b>{r.chi && r.cpa ? ngan(Math.round(r.cpa / 1000) * 1000) : "—"}</b></div>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="hint" style={{ marginTop: 14 }}>
         Giá 1 khách, giá 1 đơn và ROAS chỉ tính trên <b>khách mới</b>. Khách cũ gọi lại không tốn
@@ -372,9 +421,9 @@ function GioiTinh({ ds }: { ds: KhachHang[] }) {
     <div className="panel">
       <h2>Khách nam hay khách nữ</h2>
       <p className="sub">Không chỉ đếm đầu người — xem bên nào chốt nhiều hơn và trả cao hơn.</p>
-      <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
+      <div className="gt">
         <Vong a={nam.n} b={nu.n} nhanA="khách nam" nhanB="khách nữ" />
-        <div style={{ flex: 1, minWidth: 190 }}>
+        <div>
           <table className="bang">
             <thead><tr><th /><th className="n">Khách</th><th className="n">Tỷ lệ chốt</th><th className="n">TB/đơn</th></tr></thead>
             <tbody>
@@ -510,7 +559,7 @@ function BangChiTiet({ ds, hotlines, dsTho }: { ds: KhachHang[]; hotlines: Hotli
     <div className="panel">
       <h2>Chi tiết khách gần nhất</h2>
       <p className="sub">Đang hiện {rows.length} trên {ds.length} khách trong kỳ. Bấm “Xuất Excel” ở trên để lấy đủ.</p>
-      <div className="scrollx">
+      <div className="scrollx chi-rong">
         <table className="bang">
           <thead>
             <tr><th>Thời điểm</th><th>Khách</th><th>Điện thoại</th><th>Nguồn</th><th>Dịch vụ</th>
@@ -540,6 +589,36 @@ function BangChiTiet({ ds, hotlines, dsTho }: { ds: KhachHang[]; hotlines: Hotli
             })}
           </tbody>
         </table>
+      </div>
+      {/* Điện thoại: mỗi khách ba dòng ngắn thay cho bảng 9 cột phải cuộn ngang. */}
+      <div className="ct-ds chi-hep">
+        {rows.map((l) => {
+          const h = kenh(l.hotline_id);
+          const d = new Date(l.thoi_diem);
+          return (
+            <div className="ct" key={l.id}>
+              <div className="ct-1">
+                <b>{l.ten || "(chưa có tên)"}</b>
+                {l.la_khach_cu && <span className="cu">khách cũ</span>}
+                <span className={`tag t-${l.trang_thai}`}>
+                  {l.trang_thai === "da_chot" ? "Đã chốt" : l.trang_thai === "hoi_gia" ? "Hỏi giá" : "Từ chối"}
+                </span>
+              </div>
+              <div className="ct-2">
+                {d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}{" "}
+                {d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })} · {dinhDangSdt(l.so_dien_thoai)} ·{" "}
+                <span className="sw" style={{ background: h?.mau ?? "var(--ink3)" }} />{h?.kenh ?? "Chưa rõ nguồn"}
+              </div>
+              <div className="ct-3">
+                <span>
+                  {[l.dich_vu?.join(", "), l.khu_vuc, l.trang_thai === "tu_choi" ? l.ly_do_tu_choi : null]
+                    .filter(Boolean).join(" · ") || "—"}
+                </span>
+                {l.doanh_thu ? <b>{vnd(l.doanh_thu)}</b> : null}
+              </div>
+            </div>
+          );
+        })}
       </div>
       {!ds.length && <div className="rong"><b>Chưa có khách nào trong kỳ này.</b>Đổi khoảng thời gian ở trên, hoặc chờ thợ nhập.</div>}
     </div>
