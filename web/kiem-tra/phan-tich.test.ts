@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  baoHanhCuaDon, chiPhiKy, demTheo, doanhThuTheoDichVu, khoangKy, kyTruoc,
+  baoHanhCuaDon, chiPhiKy, demTheo, docNgay, doanhThuTheoDichVu, khoangKy, kyTruoc, ngayChuoi,
   luoiGioThu, phanTram, soNgay, theoNgay, theoNguon, tongHop, trangThaiBH,
 } from "../lib/phan-tich.ts";
 import type { Hotline, KhachHang } from "../lib/kieu.ts";
@@ -133,7 +133,31 @@ test("khoảng thời gian và kỳ so sánh không chồng lên nhau", () => {
   assert.ok(bTruoc.getTime() < a.getTime(), "kỳ trước phải kết thúc trước khi kỳ này bắt đầu");
   const [thangDau, thangCuoi] = khoangKy("truoc", moc);
   assert.equal(thangDau.getMonth(), 7, "tháng trước của tháng 9 là tháng 8");
-  assert.equal(thangCuoi.getMonth(), 8);
+  assert.equal(thangCuoi.getMonth(), 7, "kết thúc trong tháng 8, không lấn sang 0 giờ ngày 1/9");
+  assert.equal(thangCuoi.getDate(), 31);
+  assert.equal(soNgay("truoc", moc), 31, "tháng 8 có 31 ngày, không phải 32");
+});
+
+test("khoảng tự chọn: lấy trọn hai đầu, chọn ngược tự đảo, kỳ trước đúng bằng số ngày", () => {
+  const moc = new Date(2026, 8, 25, 15, 0);
+  const tuy = { tu: "2026-09-01", den: "2026-09-10" };
+  const [a, b] = khoangKy("tuy", moc, tuy);
+  assert.equal(a.getTime(), new Date(2026, 8, 1).getTime());
+  assert.equal(b.getTime(), new Date(2026, 8, 10, 23, 59, 59, 999).getTime(), "lấy trọn ngày cuối");
+  assert.equal(soNgay("tuy", moc, tuy), 10);
+  const [ta, tb] = kyTruoc("tuy", moc, tuy);
+  assert.equal(ta.getTime(), new Date(2026, 7, 22).getTime(), "10 ngày liền trước: 22/8");
+  assert.equal(tb.getTime(), a.getTime() - 1, "kỳ trước dừng ngay trước kỳ này");
+  assert.deepEqual(khoangKy("tuy", moc, { tu: "2026-09-10", den: "2026-09-01" }), [a, b], "chọn ngược thì đảo lại");
+  assert.equal(soNgay("tuy", moc, { tu: "2026-09-05", den: "2026-09-05" }), 1, "một ngày duy nhất");
+  assert.equal(soNgay("tuy", moc, { tu: "", den: "2026-09-05" }), 30, "thiếu ngày thì về 30 ngày qua");
+});
+
+test("đọc ngày từ ô chọn ngày: đúng dạng mới nhận, ngày không có thật thì bỏ", () => {
+  assert.equal(docNgay("2026-02-31"), null);
+  assert.equal(docNgay("25/09/2026"), null);
+  assert.equal(ngayChuoi(docNgay("2026-01-05")!), "2026-01-05");
+  assert.equal(ngayChuoi(new Date(2026, 11, 31, 23, 59)), "2026-12-31");
 });
 
 test("chi phí quy từ ngân sách tháng ra số ngày thực", () => {

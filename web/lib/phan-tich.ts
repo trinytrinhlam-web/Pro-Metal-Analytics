@@ -11,20 +11,10 @@ import { BAO_HANH_MAC_DINH } from "./danh-muc.ts";
  * khách mới. Gộp khách cũ vào là các con số đó rẻ đi một cách giả tạo.
  */
 
-export type Ky = "7" | "30" | "thang" | "truoc";
+export type Ky = "7" | "30" | "thang" | "truoc" | "tuy";
 
-export function khoangKy(k: Ky, moc = new Date()): [Date, Date] {
-  const cuoi = new Date(moc);
-  let dau: Date;
-  if (k === "7") dau = dauNgay(new Date(moc.getTime() - 6 * 864e5));
-  else if (k === "30") dau = dauNgay(new Date(moc.getTime() - 29 * 864e5));
-  else if (k === "thang") dau = new Date(moc.getFullYear(), moc.getMonth(), 1);
-  else {
-    dau = new Date(moc.getFullYear(), moc.getMonth() - 1, 1);
-    return [dau, new Date(moc.getFullYear(), moc.getMonth(), 1)];
-  }
-  return [dau, cuoi];
-}
+/** Khoảng tự chọn: hai ngày dạng "YYYY-MM-DD" theo giờ máy, lấy trọn cả hai đầu. */
+export type TuyChon = { tu: string; den: string };
 
 export function dauNgay(d: Date): Date {
   const x = new Date(d);
@@ -32,16 +22,51 @@ export function dauNgay(d: Date): Date {
   return x;
 }
 
-export function soNgay(k: Ky, moc = new Date()): number {
-  const [a, b] = khoangKy(k, moc);
+export function cuoiNgay(d: Date): Date {
+  const x = new Date(d);
+  x.setHours(23, 59, 59, 999);
+  return x;
+}
+
+/** "2026-09-25" → nửa đêm đầu ngày đó theo giờ máy. Chuỗi sai thì null. */
+export function docNgay(s: string | undefined): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s ?? "");
+  if (!m) return null;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return d.getMonth() === +m[2] - 1 ? d : null; // loại ngày không có thật như 31/02
+}
+
+/** Ngày → "YYYY-MM-DD" theo giờ máy, đúng dạng ô chọn ngày cần. */
+export function ngayChuoi(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+export function khoangKy(k: Ky, moc = new Date(), tuy?: TuyChon): [Date, Date] {
+  if (k === "7") return [dauNgay(new Date(moc.getTime() - 6 * 864e5)), new Date(moc)];
+  if (k === "30") return [dauNgay(new Date(moc.getTime() - 29 * 864e5)), new Date(moc)];
+  if (k === "thang") return [new Date(moc.getFullYear(), moc.getMonth(), 1), new Date(moc)];
+  if (k === "truoc") {
+    // Kết thúc ở cuối ngày cuối tháng trước. Trước đây lấy mốc 0 giờ ngày 1 tháng
+    // này làm điểm cuối nên tháng 8 bị đếm thành 32 ngày, chi phí cộng dư một ngày.
+    return [new Date(moc.getFullYear(), moc.getMonth() - 1, 1), cuoiNgay(new Date(moc.getFullYear(), moc.getMonth(), 0))];
+  }
+  const a = docNgay(tuy?.tu), b = docNgay(tuy?.den);
+  if (!a || !b) return khoangKy("30", moc);
+  const [dau, cuoi] = a <= b ? [a, b] : [b, a]; // chọn ngược thì tự đảo lại
+  return [dau, cuoiNgay(cuoi)];
+}
+
+export function soNgay(k: Ky, moc = new Date(), tuy?: TuyChon): number {
+  const [a, b] = khoangKy(k, moc, tuy);
   return Math.max(1, Math.round((dauNgay(b).getTime() - dauNgay(a).getTime()) / 864e5) + 1);
 }
 
-/** Kỳ liền trước, cùng độ dài, để so sánh. */
-export function kyTruoc(k: Ky, moc = new Date()): [Date, Date] {
-  const [a, b] = khoangKy(k, moc);
-  const dai = b.getTime() - a.getTime();
-  return [new Date(a.getTime() - dai - 864e5), new Date(a.getTime() - 1)];
+/** Kỳ liền trước, đúng bằng số ngày của kỳ đang xem, để so sánh. */
+export function kyTruoc(k: Ky, moc = new Date(), tuy?: TuyChon): [Date, Date] {
+  const [a] = khoangKy(k, moc, tuy);
+  const n = soNgay(k, moc, tuy);
+  return [new Date(a.getFullYear(), a.getMonth(), a.getDate() - n), new Date(a.getTime() - 1)];
 }
 
 export type TongHop = {

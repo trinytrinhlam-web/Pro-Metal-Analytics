@@ -312,6 +312,12 @@ table.bang tbody tr:last-child td{border-bottom:0}
 
 /* ── Phần dùng chung cho các khối có hai dạng: máy tính và điện thoại ── */
 .loc-them{display:contents}
+.loc-tuy{display:flex;gap:8px;flex-wrap:wrap}
+.loc-tuy label{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink3);font-weight:600}
+.loc-tuy input{background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;
+  font:inherit;font-size:13.5px;color:var(--ink);font-weight:500}
+.ky-chu{margin:-8px 0 14px;font-size:12px;color:var(--ink3)}
+.ky-chu b{color:var(--ink2)}
 .imp.gon{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap}
 .imp.gon .gon-chu{flex:1 1 280px;min-width:0}
 .imp.gon h2{margin:0 0 4px}
@@ -442,6 +448,12 @@ table.bang tbody tr:last-child td{border-bottom:0}
   /* Phân tích */
   .loc-pt{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-bottom:14px}
   .loc-pt select{width:100%;min-width:0}
+  /* hàng đầu luôn là: chọn kỳ + Lọc + tải lại; ô ngày và bộ lọc mở ra nằm bên dưới */
+  .loc-pt .loc-tuy{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));order:1}
+  .loc-pt .loc-them{order:2}
+  .loc-tuy label{flex-direction:column;align-items:stretch;gap:3px}
+  .loc-tuy input{width:100%;min-width:0}
+  .ky-chu{margin:-4px 0 12px}
   .loc-pt .loc-them{display:none;grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .loc-pt.mo .loc-them{display:grid}
   .loc-pt .loc-them .ghost{width:100%}

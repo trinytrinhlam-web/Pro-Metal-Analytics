@@ -3,18 +3,26 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   chiPhiKy, demTheo, doanhThuTheoDichVu, khoangKy, kyTruoc, luoiGioThu,
-  phanTram, soNgay, theoNgay, theoNguon, tongHop, type Ky,
+  ngayChuoi, phanTram, soNgay, theoNgay, theoNguon, tongHop, type Ky, type TuyChon,
 } from "@/lib/phan-tich";
 import { ngan, vnd } from "../nhap/tienIch";
 import { DuongTheoNgay, GIO_THEO_DOI, LuoiGioThu, THU_DAY, ThanhNgang, Vong } from "./bieu-do";
 import { DICH_VU, dinhDangSdt } from "@/lib/danh-muc";
 import type { Hotline, KhachHang } from "@/lib/kieu";
 
-const KY: [Ky, string][] = [["7", "7 ngày qua"], ["30", "30 ngày qua"], ["thang", "Tháng này"], ["truoc", "Tháng trước"]];
+const KY: [Ky, string][] = [
+  ["7", "7 ngày qua"], ["30", "30 ngày qua"], ["thang", "Tháng này"], ["truoc", "Tháng trước"],
+  ["tuy", "Tự chọn ngày…"],
+];
+const ddmmyy = (d: Date) => d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "2-digit" });
 const fpc = (n: number) => String(n).replace(".", ",");
 
 export default function PhanTich() {
   const [ky, setKy] = useState<Ky>("30");
+  const [tuy, setTuy] = useState<TuyChon>(() => {
+    const [a, b] = khoangKy("30");
+    return { tu: ngayChuoi(a), den: ngayChuoi(b) };
+  });
   const [nguon, setNguon] = useState("");
   const [tho, setTho] = useState("");
   const [dichVu, setDichVu] = useState("");
@@ -31,8 +39,8 @@ export default function PhanTich() {
     setDangNap(true);
     setLoi("");
     try {
-      const [a, b] = khoangKy(ky);
-      const [ta, tb] = kyTruoc(ky);
+      const [a, b] = khoangKy(ky, undefined, tuy);
+      const [ta, tb] = kyTruoc(ky, undefined, tuy);
       const lay = (tu: Date, den: Date) =>
         fetch(`/api/admin/don?tu=${tu.toISOString()}&den=${den.toISOString()}`).then(async (r) => {
           if (!r.ok) throw new Error((await r.json().catch(() => ({}))).loi || "Không đọc được dữ liệu.");
@@ -53,7 +61,7 @@ export default function PhanTich() {
     } finally {
       setDangNap(false);
     }
-  }, [ky]);
+  }, [ky, tuy]);
 
   useEffect(() => { nap(); }, [nap]);
 
@@ -80,7 +88,7 @@ export default function PhanTich() {
   }, [ds]);
 
   const so = useMemo(() => {
-    const ngay = soNgay(ky);
+    const ngay = soNgay(ky, undefined, tuy);
     const nay = loc(ds);
     const truoc = loc(dsTruoc);
     const chi = nguon === "__chua__" ? 0 : chiPhiKy(hotlines, ngay, nguon || null);
@@ -91,11 +99,13 @@ export default function PhanTich() {
       P: tongHop(truoc, chi),
       nguon: theoNguon(nay, hotlines, ngay),
     };
-  }, [ds, dsTruoc, hotlines, ky, nguon, loc]);
+  }, [ds, dsTruoc, hotlines, ky, tuy, nguon, loc]);
 
   const { A, P, nay } = so;
   const soLoc = [nguon, tho, dichVu, khuVuc].filter(Boolean).length;
-  const [tu] = khoangKy(ky);
+  const [tu, den] = khoangKy(ky, undefined, tuy);
+  const [truocTu, truocDen] = kyTruoc(ky, undefined, tuy);
+  const homNay = ngayChuoi(new Date());
 
   if (loi) {
     return (
@@ -117,9 +127,35 @@ export default function PhanTich() {
         Trên máy tính thì vẫn bày hết ra một hàng như cũ.
       */}
       <div className={`loc loc-pt${moLoc ? " mo" : ""}`}>
-        <select value={ky} onChange={(e) => setKy(e.target.value as Ky)} aria-label="Khoảng thời gian">
+        <select
+          value={ky}
+          aria-label="Khoảng thời gian"
+          onChange={(e) => {
+            const k = e.target.value as Ky;
+            // Mở "Tự chọn" thì điền sẵn đúng khoảng đang xem, chỉ việc sửa một đầu.
+            if (k === "tuy" && ky !== "tuy") {
+              const [a, b] = khoangKy(ky, undefined, tuy);
+              setTuy({ tu: ngayChuoi(a), den: ngayChuoi(b) });
+            }
+            setKy(k);
+          }}
+        >
           {KY.map(([v, c]) => <option key={v} value={v}>{c}</option>)}
         </select>
+        {ky === "tuy" && (
+          <div className="loc-tuy">
+            <label>
+              <span>Từ ngày</span>
+              <input type="date" value={tuy.tu} max={homNay}
+                     onChange={(e) => e.target.value && setTuy((t) => ({ ...t, tu: e.target.value }))} />
+            </label>
+            <label>
+              <span>Đến ngày</span>
+              <input type="date" value={tuy.den} max={homNay}
+                     onChange={(e) => e.target.value && setTuy((t) => ({ ...t, den: e.target.value }))} />
+            </label>
+          </div>
+        )}
         <button className="ghost loc-nut chi-hep" aria-expanded={moLoc} onClick={() => setMoLoc((v) => !v)}>
           Lọc{soLoc ? ` (${soLoc})` : ""} {moLoc ? "▴" : "▾"}
         </button>
@@ -154,6 +190,11 @@ export default function PhanTich() {
           {dangNap ? "…" : "↻"}<span className="chi-rong"> {dangNap ? "Đang đọc" : "Tải lại"}</span>
         </button>
       </div>
+
+      <p className="ky-chu">
+        Đang xem <b>{ddmmyy(tu)} – {ddmmyy(den)}</b> ({so.ngay} ngày) · các mũi tên ▲▼ so với{" "}
+        {ddmmyy(truocTu)} – {ddmmyy(truocDen)}
+      </p>
 
       {/*
         Tiền quảng cáo ghi theo kênh, không chẻ được theo thợ, dịch vụ hay phường
