@@ -7,6 +7,12 @@ const MAU_CHON: [string, string][] = [
   ["var(--s4)", "Vàng"], ["var(--s5)", "Hồng"],
 ];
 
+type KetQuaThu = {
+  xong: boolean; chu: string; chiTiet: string; model: string;
+  buoc?: { ten: string; ok: boolean | null; chu: string }[];
+  mau?: { cau: string; cot: { ten: string; mong: string; duoc: string; dung: boolean; chinh: boolean }[] };
+};
+
 export default function CaiDat({ ten: _ten }: { ten: string }) {
   const [dsTho, setDsTho] = useState<Tho[]>([]);
   const [dsHl, setDsHl] = useState<Hotline[]>([]);
@@ -17,7 +23,7 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
   const [kenhMoi, setKenhMoi] = useState("");
   const [diaChi, setDiaChi] = useState("");
   const [daCopy, setDaCopy] = useState("");
-  const [ai, setAi] = useState<{ xong: boolean; chu: string; chiTiet: string; model: string } | null>(null);
+  const [ai, setAi] = useState<KetQuaThu | null>(null);
   const [dangThu, setDangThu] = useState(false);
 
   // Địa chỉ app lấy từ chính trình duyệt, khỏi phải cấu hình thêm biến nào.
@@ -256,6 +262,7 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
             disabled={dangThu}
             onClick={async () => {
               setDangThu(true);
+              setAi(null);
               try {
                 const r = await fetch("/api/admin/kiem-tra-ai");
                 setAi(await r.json());
@@ -266,19 +273,44 @@ export default function CaiDat({ ten: _ten }: { ten: string }) {
               }
             }}
           >
-            {dangThu ? "Đang thử…" : "Kiểm tra khoá Gemini"}
+            {dangThu ? "Đang thử… (chừng 10 giây)" : "Kiểm tra Gemini"}
           </button>
-          {ai && (
-            <span style={{ fontWeight: 700, color: ai.xong ? "var(--good)" : "var(--crit)" }}>
-              {ai.xong ? "✓" : "✕"} {ai.chu}
-            </span>
-          )}
+          {ai && <b className={`ai-kq ${ai.xong ? "tot" : "hong"}`}><span aria-hidden="true">{ai.xong ? "✓" : "✕"}</span> {ai.chu}</b>}
         </div>
+
+        {ai?.buoc && ai.buoc.length > 0 && (
+          <ol className="ai-buoc">
+            {ai.buoc.map((x) => (
+              <li key={x.ten} className={x.ok ? "tot" : "hong"}>
+                <span aria-hidden="true">{x.ok ? "✓" : "✕"}</span>
+                <span><b>{x.ten}</b> — {x.chu}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {ai?.mau && (
+          <div className="ai-mau">
+            <div className="lb">Câu mẫu đưa cho Gemini</div>
+            <p>“{ai.mau.cau}”</p>
+            <table className="bang">
+              <thead><tr><th>Ô</th><th>Phải ra</th><th>Gemini điền</th><th /></tr></thead>
+              <tbody>
+                {ai.mau.cot.map((c) => (
+                  <tr key={c.ten}>
+                    <td>{c.ten}</td>
+                    <td>{c.mong}</td>
+                    <td><b>{c.duoc}</b></td>
+                    <td className={c.dung ? "tot" : c.chinh ? "hong" : "nhac"}>{c.dung ? "✓" : c.chinh ? "✕" : "≈"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         {ai && (
-          <div
-            className="hint"
-            style={{ marginTop: 10, borderLeftColor: ai.xong ? "var(--good)" : "var(--crit)" }}
-          >
+          <div className="hint" style={{ marginTop: 10, borderLeftColor: ai.xong ? "var(--good)" : "var(--crit)" }}>
             {ai.chiTiet}
           </div>
         )}

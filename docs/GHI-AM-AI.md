@@ -132,11 +132,33 @@ này có nhãn *“lời bạn vừa đọc, sửa hoặc xoá được”* đ�
 2. Vercel → **Settings → Environment Variables** → tên biến `GEMINI_API_KEY`,
    khoá dán vào ô **Value**
 3. **Redeploy**
-4. `/admin` → **Cài đặt** → **Kiểm tra khoá Gemini**
+4. `/admin` → **Cài đặt** → **Kiểm tra Gemini**
 
-Nút kiểm tra hỏi thẳng Google xem model có dùng được không — nhẹ, không tốn
-token, và phân biệt được ba thứ mà trước đây ra cùng một câu báo lỗi: khoá sai,
-tên model sai, và hết hạn mức.
+Nút kiểm tra chạy đúng đoạn code thợ dùng, bằng khoá thật trên Vercel, qua ba bước:
+
+| Bước | Kiểm gì |
+|---|---|
+| 1. Khoá và tên model | Khoá dùng được, model có thật |
+| 2. Hiểu lời thợ đọc | Đưa một câu mẫu *"Chị Lan, không chín không chín, một hai ba, bốn năm sáu. Sửa cửa kéo, ở Gò Vấp… bốn triệu tám"* rồi so từng ô Gemini điền với đáp án |
+| 3. Nhận file ghi âm | Gửi 1 giây WAV đúng khuôn máy thợ gửi |
+
+Hỏng bước nào nói rõ bước đó và phải sửa ở đâu: khoá sai, tên model sai, hết
+hạn mức, hay model nghe số chưa chuẩn.
+
+## Máy thợ ghi âm ra file gì
+
+**WAV, 16 kHz, một kênh** — tự đóng file ngay trên điện thoại, không dùng kiểu
+ghi âm có sẵn của trình duyệt. Lý do: Chrome trên Android ghi ra webm, Safari
+trên iPhone ghi ra mp4, mà cả hai đều không có trong danh sách định dạng Gemini
+ghi trong tài liệu (WAV, MP3, AIFF, AAC, OGG, FLAC). Tự đóng WAV thì máy nào gửi
+lên cũng y hệt nhau.
+
+Gemini tự hạ tiếng về 16 kHz khi nghe, nên gửi cao hơn chỉ tốn sóng. 16 kHz một
+kênh là 32 KB mỗi giây. Ghi tối đa **60 giây** rồi tự dừng và gửi đi, chưa tới
+2 MB (Vercel chặn ở 4,5 MB).
+
+Bấm rồi dừng ngay (dưới 0,6 giây) thì máy chủ báo lại cho thợ, không gửi sang
+Google cho tốn lượt.
 
 Chưa cắm khoá thì thanh ghi âm tự ẩn khỏi màn thợ.
 

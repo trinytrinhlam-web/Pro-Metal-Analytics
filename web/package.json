@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test kiem-tra/logic.test.ts kiem-tra/phan-tich.test.ts kiem-tra/doc-csv.test.ts kiem-tra/van-de.test.ts",
+    "test": "node --experimental-strip-types --test kiem-tra/logic.test.ts kiem-tra/phan-tich.test.ts kiem-tra/doc-csv.test.ts kiem-tra/van-de.test.ts kiem-tra/giong-noi.test.ts",
     "tao-admin": "node scripts/tao-admin.mjs"
   },
   "dependencies": {

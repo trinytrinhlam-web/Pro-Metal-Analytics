@@ -220,8 +220,9 @@ triệu tám&quot; — Gemini nghe rồi điền sẵn vào form, thợ soát l�
 2. Vercel → **Settings → Environment Variables** → thêm biến tên `GEMINI_API_KEY`,
    dán khoá vào ô **Value** (ô **Key** là *tên biến*, không phải chỗ dán khoá)
 3. **Redeploy** — biến môi trường mới chỉ có hiệu lực sau khi deploy lại
-4. Vào `/admin` → **Cài đặt** → bấm **Kiểm tra khoá Gemini**. Nó nói thẳng chạy
-   được hay hỏng ở đâu, khỏi phải bảo thợ ghi âm thử
+4. Vào `/admin` → **Cài đặt** → bấm **Kiểm tra Gemini** (chừng 10 giây). Nó chạy
+   thật ba bước bằng khoá trên Vercel — khoá và tên model, hiểu một câu thợ đọc
+   mẫu, nhận file ghi âm — rồi nói thẳng chạy được hay hỏng ở bước nào
 
 Chưa cắm khoá thì thanh ghi âm tự ẩn, thợ vẫn nhập tay bình thường.
 

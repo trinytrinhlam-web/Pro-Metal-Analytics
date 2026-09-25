@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import ManPin from "./ManPin";
 import ChonKhuVuc from "./ChonKhuVuc";
 import { guiLai, soDonCho, taoKhoa, themVaoHangDoi } from "./hangDoi";
+import { batDauGhi, GIAY_TOI_DA, type PhienGhi } from "./ghiAm";
 import { coGiDangKe, docBanNhap, luuBanNhap, xoaBanNhap } from "./banNhap";
 import { choInputNgayGio, ddmm, hhmm, ngan, tat } from "./tienIch";
 import { DICH_VU, LOAI_CONG_TRINH, LY_DO_TU_CHOI, chuanSdt, dinhDangSdt } from "@/lib/danh-muc";
@@ -56,7 +57,7 @@ export default function NhapApp({
   const [daKhoiPhuc, setDaKhoiPhuc] = useState(false);
   const [giay, setGiay] = useState(0);
   const [loiDoc, setLoiDoc] = useState("");
-  const mrRef = useRef<MediaRecorder | null>(null);
+  const ghiRef = useRef<PhienGhi | null>(null);
   const dongHo = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const hcToast = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -158,46 +159,55 @@ export default function NhapApp({
 
   /* ── đọc bằng giọng nói ───────────────────────────────────────────── */
   async function batGhi() {
+    let phien: PhienGhi;
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(s);
-      const manh: Blob[] = [];
-      mr.ondataavailable = (e) => e.data.size && manh.push(e.data);
-      mr.onstop = async () => {
-        s.getTracks().forEach((t) => t.stop());
-        if (dongHo.current) clearInterval(dongHo.current);
-        const blob = new Blob(manh, { type: mr.mimeType || "audio/webm" });
-        setVoice("gui");
-        try {
-          const r = await fetch("/api/giong-noi", {
-            method: "POST",
-            headers: { "content-type": blob.type },
-            body: blob,
-          });
-          const j = await r.json();
-          if (!r.ok) {
-            setVoice("cho");
-            return bao(j.loi || "Máy không nghe được, nhập tay giúp.", true);
-          }
-          apKetQua(j.ket_qua);
-          setVoice("xong");
-        } catch {
-          setVoice("cho");
-          bao("Mất sóng nên chưa gửi được tiếng, nhập tay giúp.", true);
-        }
-      };
-      mrRef.current = mr;
-      mr.start();
-      setGiay(0);
-      setVoice("ghi");
-      dongHo.current = setInterval(() => setGiay((g) => g + 1), 1000);
+      phien = await batDauGhi();
     } catch {
-      bao("Máy không cho dùng micro. Vào cài đặt trình duyệt bật quyền micro.", true);
+      return bao("Máy không cho dùng micro. Vào cài đặt trình duyệt bật quyền micro.", true);
+    }
+    ghiRef.current = phien;
+    setGiay(0);
+    setVoice("ghi");
+    let dem = 0;
+    dongHo.current = setInterval(() => {
+      dem++;
+      setGiay(dem);
+      if (dem >= GIAY_TOI_DA) dungGhi();
+    }, 1000);
+  }
+
+  async function dungGhi() {
+    const phien = ghiRef.current;
+    if (!phien) return;
+    ghiRef.current = null;
+    if (dongHo.current) clearInterval(dongHo.current);
+    const wav = phien.dung();
+    setVoice("gui");
+    try {
+      const r = await fetch("/api/giong-noi", {
+        method: "POST",
+        headers: { "content-type": "audio/wav" },
+        body: wav,
+      });
+      if (r.status === 401) { setTho(null); return; }
+      const j = await r.json();
+      if (!r.ok) {
+        setVoice("cho");
+        return bao(j.loi || "Máy không nghe được, nhập tay giúp.", true);
+      }
+      apKetQua(j.ket_qua);
+      setVoice("xong");
+    } catch {
+      setVoice("cho");
+      bao("Mất sóng nên chưa gửi được tiếng, nhập tay giúp.", true);
     }
   }
-  function dungGhi() {
-    mrRef.current?.stop();
-  }
+
+  // Rời màn hình giữa lúc đang ghi thì tắt micro, không để đèn micro sáng mãi.
+  useEffect(() => () => {
+    ghiRef.current?.huy();
+    if (dongHo.current) clearInterval(dongHo.current);
+  }, []);
 
   type KQ = {
     ten: string | null; so_dien_thoai: string | null; gioi_tinh: GioiTinh | null;
@@ -329,10 +339,11 @@ export default function NhapApp({
   const tien = chot.reduce((s, d) => s + (d.doanh_thu ?? 0), 0);
   const thieuTien = dsHomNay.filter((d) => d.trang_thai === "da_chot" && !d.doanh_thu).length;
   const lop = (k: string) => `fld${f.ai[k] ? " ai" : ""}`;
+  const laAdmin = tho.vaiTro === "admin";
 
   return (
     <div className="app">
-      <header className="appbar">
+      <header className={`appbar${laAdmin ? " co-admin" : ""}`}>
         <button
           className="avt"
           title="Đổi thợ"
@@ -345,11 +356,16 @@ export default function NhapApp({
         </button>
         <div className="who">
           <b>{tho.ten}</b>
-          <span>Thợ nhập liệu</span>
+          <span>{laAdmin ? "Admin" : "Thợ nhập liệu"}</span>
         </div>
         <span className="pill">
-          Hôm nay <b>{homNay.length}</b> khách · {chot.length} chốt · {ngan(tien)}
+          <span className="p-dai">Hôm nay </span><b>{homNay.length}</b> khách<span className="p-dai"> · {chot.length} chốt</span> · {ngan(tien)}
         </span>
+        {/* Chỉ admin mới thấy — thợ không có quyền vào màn admin, hiện nút ra
+            chỉ để bấm vào rồi bị từ chối. */}
+        {laAdmin && (
+          <a className="ve-admin" href="/admin" aria-label="Về trang admin">Admin</a>
+        )}
       </header>
 
       {!online && <div className="offline">Đang mất sóng — cứ nhập bình thường, có sóng máy tự gửi</div>}
@@ -664,7 +680,11 @@ function VoiceBar({
     return (
       <div className="voice">
         <h3>🎤 Đang nghe…</h3>
-        <p>Đọc tên, số điện thoại, làm gì, ở đâu, chốt chưa, bao nhiêu tiền. Xong bấm dừng.</p>
+        <p>
+          {giay >= GIAY_TOI_DA - 15
+            ? <b>Còn {Math.max(0, GIAY_TOI_DA - giay)} giây — hết giờ máy tự dừng và gửi đi.</b>
+            : "Đọc tên, số điện thoại, làm gì, ở đâu, chốt chưa, bao nhiêu tiền. Xong bấm dừng."}
+        </p>
         <button className="mic rec" onClick={dung}>Dừng lại · {dongHo}</button>
       </div>
     );
