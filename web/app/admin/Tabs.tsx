@@ -14,6 +14,9 @@ const MUC = [
 
 type Thieu = { file: string; them: string };
 
+/** Màn Duyệt đơn phát sự kiện này sau khi sửa hoặc xoá đơn. */
+export const SU_KIEN_DON_DOI = "csr-don-doi";
+
 export default function Tabs() {
   const duong = usePathname();
   const [cho, setCho] = useState(0);
@@ -28,12 +31,18 @@ export default function Tabs() {
       .catch(() => {});
   }, []);
 
-  // Số đơn chờ duyệt hiện ngay trên tab, khỏi phải bấm vào mới biết.
+  // Số đơn chờ duyệt hiện ngay trên tab, khỏi phải bấm vào mới biết. Đếm lại
+  // mỗi khi màn Duyệt đơn xác nhận hay xoá đơn — không thì xoá đơn cuối cùng
+  // xong tab vẫn ghi "1", trông như xoá không ăn.
   useEffect(() => {
-    fetch("/api/admin/don?chua_duyet=1")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => j && setCho(j.ds.length))
-      .catch(() => {});
+    const dem = () =>
+      fetch("/api/admin/don?chua_duyet=1")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => j && setCho(j.ds.length))
+        .catch(() => {});
+    dem();
+    window.addEventListener(SU_KIEN_DON_DOI, dem);
+    return () => window.removeEventListener(SU_KIEN_DON_DOI, dem);
   }, [duong]);
 
   return (

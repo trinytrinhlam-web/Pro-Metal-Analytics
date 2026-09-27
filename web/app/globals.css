@@ -264,6 +264,12 @@ table.bang tbody tr:last-child td{border-bottom:0}
 .dd-o .inp,.dd-o select{padding:9px 11px;font-size:14px;border-radius:10px}
 .dd-hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}
 .dd-hd .ok{border:0;background:var(--good);color:#fff;border-radius:10px;padding:9px 16px;font-weight:700;font-size:13.5px}
+.dd-xoa{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;padding:10px 12px;
+  border:1px dashed var(--line2);border-radius:11px;font-size:12px;color:var(--ink3)}
+.dd-xoa button{border:1.5px solid var(--crit);background:var(--panel);color:var(--crit);border-radius:10px;
+  padding:8px 13px;font-weight:700;font-size:13px;flex:none}
+.dd-xoa button.that{background:var(--crit);color:#fff}
+.dd-xoa span{flex:1 1 180px;min-width:0;line-height:1.45}
 .trung{background:var(--crit-bg);border:1.5px solid var(--crit);border-radius:12px;padding:12px 14px;margin-top:11px}
 .trung h4{margin:0 0 6px;font-size:13.5px;font-family:Archivo,sans-serif;font-weight:800;color:var(--crit)}
 .trung .cu{font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:10px}

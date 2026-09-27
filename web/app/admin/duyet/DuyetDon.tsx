@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DICH_VU, KHU_VUC, LOAI_CONG_TRINH, LY_DO_TU_CHOI, chuanSdt, dinhDangSdt } from "@/lib/danh-muc";
 import { donTruoc, gioCach, loiThat, vanDeCuaDon, type VanDe } from "@/lib/van-de";
 import { ngan, vnd } from "../../nhap/tienIch";
+import { SU_KIEN_DON_DOI } from "../Tabs";
 import NhapBaoCao from "./NhapBaoCao";
 import type { Hotline, KhachHang, TrangThai } from "@/lib/kieu";
 
@@ -49,15 +50,22 @@ export default function DuyetDon() {
     // Cập nhật tại chỗ, khỏi tải lại cả danh sách cho mượt tay.
     const moi = (j.ds ?? []) as KhachHang[];
     setDs((cu) => cu.map((d) => moi.find((m) => m.id === d.id) ?? d));
+    window.dispatchEvent(new Event(SU_KIEN_DON_DOI));
     return moi;
   }
 
   async function xoa(id: string) {
-    if (xacNhanXoa !== id) { setXacNhanXoa(id); return; }
+    if (xacNhanXoa !== id) {
+      setXacNhanXoa(id);
+      // Không bấm lần hai trong 5 giây thì thôi — kẻo lát sau lỡ tay chạm vào là mất đơn.
+      setTimeout(() => setXacNhanXoa((c) => (c === id ? "" : c)), 5000);
+      return;
+    }
     const r = await fetch(`/api/admin/don?id=${id}`, { method: "DELETE" });
     if (!r.ok) { setLoi("Không xoá được."); return; }
     setDs((cu) => cu.filter((d) => d.id !== id));
     setXacNhanXoa("");
+    window.dispatchEvent(new Event(SU_KIEN_DON_DOI));
   }
 
   const hienThi = useMemo(() => {
@@ -236,6 +244,19 @@ function The({
       {truoc && <KhoiTrung l={l} truoc={truoc} hotlines={hotlines} ganNguon={ganNguon} xoa={xoa} xacNhanXoa={xacNhanXoa} boQua={boQua} duyet={duyet} />}
 
       {mo && <SuaThem l={l} sua={sua} />}
+      {/* Nằm trong phần "Sửa thêm" chứ không để ngoài, cho xa nút Xác nhận — xoá là mất hẳn. */}
+      {mo && (
+        <div className="dd-xoa">
+          <button className={xacNhanXoa ? "that" : ""} onClick={xoa}>
+            {xacNhanXoa ? "Bấm lần nữa để xoá hẳn" : "🗑 Xoá đơn này"}
+          </button>
+          <span>
+            {xacNhanXoa
+              ? `Xoá luôn cả hạn bảo hành${l.doanh_thu ? ` và ${vnd(l.doanh_thu)} tiền công` : ""} của đơn này, không khôi phục được.`
+              : "Dùng khi nhập nhầm, khách ảo, hoặc số gọi nhầm."}
+          </span>
+        </div>
+      )}
 
       <div className="dd-hd">
         <button className="ghost" onClick={doiMo}>{mo ? "Thu gọn ▴" : "Sửa thêm ▾"}</button>
